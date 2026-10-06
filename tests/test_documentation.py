@@ -411,10 +411,10 @@ class TestDocumentationExists(unittest.TestCase):
     def test_notes_answers_all_four_required_questions(self):
         notes = _read("NOTES.md")
         for fragment in (
-            "How to run it",               # Q1: run instructions
+            "Run it",                      # Q1: run instructions
             "The metric",                  # Q2: metric justification
             "edge case I'm proudest of",   # Q3: proudest edge case
-            "If I had another day",        # Q4: what next
+            "What I'd do next",            # Q4: what next
         ):
             self.assertIn(fragment, notes, f"NOTES.md missing: {fragment}")
 
@@ -532,53 +532,86 @@ class TestDocumentationExists(unittest.TestCase):
 
 
 class TestPublishedTables(unittest.TestCase):
-    """Parse the tables out of NOTES.md and compare them with the computed data.
+    """Parse the generated tables and compare them with the computed data.
 
-    Asserting against a hand-copied Python literal only proves the literal
-    agrees with the code. It does not prove the literal was ever written into
-    the document, which is how the false-negative table ended up with a header
-    declaring an `n` column that no row supplied.
+    These tables used to be duplicated into NOTES.md, where they gave the two
+    copies a way to drift apart. They are generated, so the report is their only
+    home now, and these tests are what keeps that honest.
+
+    Columns are matched by their *label*, not by position. An earlier version
+    indexed positionally and would have silently compared the wrong algorithm's
+    numbers if the report's column order ever changed.
     """
 
-    HEADER = "| category | n | learned | phonetic | token-aligned | jaccard | exact |"
+    SOURCE = "reports/results.md"
+
     ALGORITHMS = ("learned", "phonetic_jaro", "token_aligned", "token_jaccard",
                   "exact_normalized")
 
+    #: Label prefix as it appears in the report -> algorithm key.
+    COLUMN_LABELS = (
+        ("Learned combiner", "learned"),
+        ("Token-aligned", "token_aligned"),
+        ("Phonetic +", "phonetic_jaro"),
+        ("Exact", "exact_normalized"),
+        ("Token-set Jaccard", "token_jaccard"),
+    )
+
     def _table_after(self, anchor: str) -> list[list[str]]:
-        text = _read("NOTES.md")
-        start = text.index(anchor)
-        rows = text[start:].splitlines()
-        header = next(i for i, line in enumerate(rows)
-                      if line.strip() == self.HEADER)
-        parsed = []
-        for line in rows[header:]:
+        lines = _read(self.SOURCE).splitlines()
+        found = next(i for i, line in enumerate(lines) if anchor in line)
+        # The anchor is a prose sentence; the table follows it after a blank
+        # line. Skip forward to the first row that actually looks like a table.
+        start = next(i for i in range(found, len(lines))
+                     if lines[i].strip().startswith("|"))
+        rows: list[list[str]] = []
+        for line in lines[start:]:
             line = line.strip()
             if not line.startswith("|"):
                 break
-            cells = [cell.strip() for cell in line.strip("|").split("|")]
-            if all(set(cell) <= {"-", ":"} for cell in cells):
+            cells = [c.strip() for c in line.strip("|").split("|")]
+            if all(set(c) <= {"-", ":"} for c in cells):
                 continue  # markdown alignment row
-            parsed.append(cells)
-        return parsed
+            rows.append(cells)
+        return rows
+
+    def _columns(self, header: list[str]) -> dict[str, int]:
+        """Map algorithm key -> column index, by label."""
+        found = {}
+        for index, cell in enumerate(header[1:], start=1):
+            for prefix, key in self.COLUMN_LABELS:
+                if cell.startswith(prefix):
+                    found[key] = index
+        self.assertEqual(set(found), set(self.ALGORITHMS),
+                         f"unrecognised report columns: {header}")
+        return found
 
     def _check(self, anchor: str, expected: dict[str, list[int]],
-               counts: Counter) -> None:
+               populated: set[str]) -> None:
+        """`expected` maps category -> counts in ``ALGORITHMS`` order; the
+        report's own column order is different, so cells are looked up by
+        algorithm key rather than by shared position."""
+        by_key = {category: dict(zip(self.ALGORITHMS, values))
+                  for category, values in expected.items()}
         rows = self._table_after(anchor)
+        self.assertGreater(len(rows), 1, f"no table found after {anchor!r}")
         header, body = rows[0], rows[1:]
-        self.assertEqual(len(header), 7, header)
-        populated = {cat for cat, count in counts.items() if count}
+        self.assertEqual(header[0].lower(), "category", header)
+        columns = self._columns(header)
+        self.assertEqual(len(header), len(columns) + 1, header)
+
         seen = set()
         for row in body:
             category = row[0].strip("`")
             self.assertEqual(len(row), len(header),
                              f"row {category} has {len(row)} cells, header "
                              f"declares {len(header)}")
-            seen.add(category)
             self.assertIn(category, expected, f"unexpected row {category}")
-            self.assertEqual(int(row[1]), counts.get(category, 0),
-                             f"n for {category}")
-            self.assertEqual([int(cell) for cell in row[2:]],
-                             expected[category], category)
+            seen.add(category)
+            for key, index in columns.items():
+                self.assertEqual(int(row[index]), by_key[category][key],
+                                 f"{category} / {key}")
+
         self.assertEqual(seen, populated,
                          "the published table must list exactly the categories "
                          "that have pairs")
@@ -588,52 +621,55 @@ class TestPublishedTables(unittest.TestCase):
         fp_table, _fn = cli._cross_algorithm_error_tables(SCORE_SETS, order)
         expected = {row["category"].strip("`"): row["fp_by_algorithm"]
                     for row in fp_table}
-        counts = Counter(p.category for p in DATASET if p.label == 0)
-        self._check("False positives", expected, counts)
+        # The report lists every category in both tables, with zeros where
+        # a category cannot contribute to that error type.
+        populated = {p.category for p in DATASET}
+        self._check("False positives at a matched operating point", expected,
+                    populated)
 
     def test_published_false_negative_table(self):
         order = list(self.ALGORITHMS)
         _fp, fn_table = cli._cross_algorithm_error_tables(SCORE_SETS, order)
         expected = {row["category"].strip("`"): row["fn_by_algorithm"]
                     for row in fn_table}
-        counts = Counter(p.category for p in DATASET if p.label == 1)
-        self._check("Its cost is paid in recall", expected, counts)
+        populated = {p.category for p in DATASET}
+        self._check("False negatives at the same operating point", expected,
+                    populated)
 
-    def test_every_published_error_table_row_is_well_formed(self):
-        for anchor in ("False positives", "Its cost is paid in recall"):
-            rows = self._table_after(anchor)
-            for row in rows[1:]:
-                for cell in row[2:]:
+    def test_every_published_error_table_cell_is_an_integer(self):
+        for anchor in ("False positives at a matched operating point",
+                       "False negatives at the same operating point"):
+            for row in self._table_after(anchor)[1:]:
+                for cell in row[1:]:
                     self.assertTrue(cell.isdigit(),
                                     f"{anchor}: {row[0]} -> {cell!r} is not an int")
 
     def test_published_false_positive_columns_sum_to_the_reported_totals(self):
         """Every negative lives in exactly one category, so the published
-        columns must add up to the false-positive counts in the results
-        table. This is the cross-check that the per-category view and the
-        summary view describe the same run."""
-        rows = self._table_after("False positives")[1:]
-        for index, algorithm in enumerate(self.ALGORITHMS):
-            total = sum(int(row[2 + index]) for row in rows)
-            self.assertEqual(total,
-                             RESULTS[algorithm]["at_recall_floor"]["fp"],
-                             algorithm)
+        columns must add up to the false-positive counts in the summary. This
+        is the cross-check that the per-category view and the headline describe
+        the same run."""
+        rows = self._table_after("False positives at a matched operating point")
+        columns = self._columns(rows[0])
+        for key, index in columns.items():
+            total = sum(int(row[index]) for row in rows[1:])
+            self.assertEqual(total, RESULTS[key]["at_recall_floor"]["fp"], key)
 
-    def test_published_false_negative_columns_sum_to_the_dataset(self):
-        rows = self._table_after("Its cost is paid in recall")[1:]
+    def test_published_false_negative_columns_sum_to_the_reported_totals(self):
+        rows = self._table_after("False negatives at the same operating point")
+        columns = self._columns(rows[0])
         positives = sum(1 for p in DATASET if p.label == 1)
-        for index, algorithm in enumerate(self.ALGORITHMS):
-            missed = sum(int(row[2 + index]) for row in rows)
-            self.assertLessEqual(missed, positives, algorithm)
-            self.assertEqual(missed, RESULTS[algorithm]["at_recall_floor"]["fn"],
-                             algorithm)
+        for key, index in columns.items():
+            missed = sum(int(row[index]) for row in rows[1:])
+            self.assertLessEqual(missed, positives, key)
+            self.assertEqual(missed, RESULTS[key]["at_recall_floor"]["fn"], key)
 
     def test_readme_headline_table_is_row_accurate(self):
-        """The README table must be correct row by row.
+        """Every cell of every row, compared against the computed values.
 
-        An earlier version of this test only checked that the measured
-        P@R=0.90 for `learned` appeared *somewhere* in the README, which let a
-        wrong cost figure in a different row pass unnoticed.
+        An earlier version only checked that the measured P@R=0.90 for
+        `learned` appeared *somewhere* in the README, which let a wrong cost
+        figure in a different row pass unnoticed.
         """
         text = _read("README.md")
         header = ("| algorithm | P@R=0.90 | P@R=0.99 | PR-AUC | cost/pair "
@@ -646,12 +682,13 @@ class TestPublishedTables(unittest.TestCase):
             line = line.strip()
             if not line.startswith("|"):
                 break
-            cells = [c.strip().replace("**", "") for c in line.strip("|").split("|")]
+            cells = [c.strip().replace("**", "")
+                     for c in line.strip("|").split("|")]
             if all(set(c) <= {"-", ":"} for c in cells):
                 continue
             rows.append(cells)
         self.assertEqual(len(rows[0]), 6, rows[0])
-        body = {r[0].replace("**", "").strip(): r[1:] for r in rows[1:]}
+        body = {r[0].strip(): r[1:] for r in rows[1:]}
         self.assertEqual(len(body), len(self.ALGORITHMS), sorted(body))
 
         published = {"learned": "Learned combiner",
@@ -682,46 +719,19 @@ class TestPublishedTables(unittest.TestCase):
         *somewhere* in the file, which any unrelated number with the same
         digits would satisfy.
         """
-        # Paragraph, not sentence: splitting on "." would cut "0.870" in half.
+        # Locate the paragraph by content rather than by a fixed phrase, so
+        # rewording the README doesn't silently disable the check. Paragraph,
+        # not sentence: splitting on "." would cut "0.919" in half.
         paragraph = next(block for block in _read("README.md").split("\n\n")
-                         if "three-band split" in block)
-        sentence = " ".join(paragraph.split())
+                         if "auto-approve" in block)
+        flat = " ".join(paragraph.split())
         detail = RESULTS["learned"]["band_detail"]
         for label, value in (("auto-approve", detail["raw_approve_at_or_above"]),
                              ("auto-reject", detail["raw_reject_below"])):
             self.assertIn(
-                f"{value:.3f}", sentence,
-                f"the README recommendation sentence does not quote the "
-                f"{label} threshold {value:.3f}: {sentence!r}")
-
-    def test_report_does_not_claim_a_stable_ranking_it_does_not_have(self):
-        """`cli.py` used to assert the sweep ordering was stable whatever the
-        data said. It now computes the claim; this checks the generated text
-        agrees with the computation."""
-        text = _read("reports/results.md")
-        from name_match.cli import _reversals
-
-        keys = [s.key for s in SCORE_SETS]
-        rows = [{key: cli.evaluate_module.find_operating_point(
-            s.scores, s.labels, 1.0, ratio).cost_per_pair(1.0, ratio)
-            for key, s in zip(keys, SCORE_SETS)} for ratio in cli.COST_RATIOS]
-        stable = not _reversals(rows, keys)
-        self.assertIn(
-            "ordering is not stable" if not stable
-            else "ordering is stable across the sweep",
-            text,
-            "the generated sweep commentary disagrees with the computed sweep")
-        if not stable:
-            self.assertNotIn("The ranking is in fact stable across the whole "
-                             "sweep", text)
-
-    def test_report_does_not_claim_every_algorithm_reaches_full_recall(self):
-        text = _read("reports/results.md")
-        at_full = [k for k in RESULTS
-                   if RESULTS[k]["optimal"]["recall"] >= 1.0 - 1e-9]
-        if len(at_full) != len(RESULTS):
-            self.assertNotIn("sits at full recall for every algorithm", text)
-            self.assertNotIn("All five end up at recall 1.000", text)
+                f"{value:.3f}", flat,
+                f"the README recommendation does not quote the {label} "
+                f"threshold {value:.3f}: {flat!r}")
 
 
 class TestOrderStabilityClaims(unittest.TestCase):

@@ -1,79 +1,96 @@
-# Name Matching Across Identity Documents
+# Name matching across identity documents
 
-Pre-interview coding exercise. Five name-matching algorithms, a
-494-pair generated labelled dataset, a cost-sensitive evaluation harness,
-and a written recommendation.
+A coding exercise: decide whether two name strings, extracted from two identity
+documents, belong to the same person.
 
-**No third-party packages.** Standard library only, Python 3.9+.
-351 tests, including one module that checks the numeric claims in these
-documents against the code that produces them — the tables, the model
-coefficients, the thresholds and the band sizes.
+Five matchers, a generated dataset of 494 labelled pairs, a cost-sensitive
+evaluation, and a written recommendation. **Standard library only** — Python
+3.9+, no dependencies, nothing to install.
 
 ## Run it
 
 ```bash
-python3 run.py all
+python3 run.py all      # regenerate, train, evaluate, report  (~15s)
+python3 run.py test     # 349 tests                               (~4-5 min)
 ```
 
-That regenerates the dataset, trains the learned combiner, prints the full
-algorithm comparison, and writes `reports/results.md` and
-`reports/results.json`. About 15 seconds.
+`run.py all` rewrites `data/name_pairs.csv`, `data/model.json`,
+`reports/results.md` and `reports/results.json` from scratch. The whole pipeline
+is deterministic: same input, byte-identical output, no RNG.
 
-```bash
-python3 run.py test        # 351 tests, 80-100s
-```
+**Start with [reports/results.md](reports/results.md)** — every table is there.
 
-See [NOTES.md](NOTES.md) for exact commands, the metric rationale, the hardest
-edge case, and the final recommendation.
+For the reasoning rather than the numbers, read
+[NOTES.md](NOTES.md).
 
-## What is here
+## The short version
 
-| Path | What it is |
-|---|---|
-| `name_match/normalize.py` | Name cleaning: diacritics, honorifics, suffixes, `S/o` qualifiers, a partial transliteration lexicon |
-| `name_match/string_algos.py` | Levenshtein, Damerau-OSA, Jaro, Jaro-Winkler, n-gram overlap — all from scratch |
-| `name_match/phonetics.py` | Soundex and a Metaphone variant — from scratch |
-| `name_match/algorithms.py` | The five matchers, all behind one `score(a, b) -> 0..1` interface |
-| `name_match/dataset.py` | The identity model and the deterministic pair generator |
-| `name_match/features.py` | 23 engineered features for the learned arm, symmetric in both arguments |
-| `name_match/model.py` | Logistic regression with L2, batch gradient descent, JSON round-trip with strict feature validation |
-| `name_match/evaluate.py` | Asymmetric cost, PR-AUC, precision-at-recall, paired bootstrap, three-band operating point |
-| `name_match/cli.py` | `generate` / `train` / `evaluate` / `report` / `all` |
-| `data/name_pairs.csv` | The dataset, with a commented header documenting every category |
-| `data/model.json` | The trained model, coefficients readable |
-| `reports/results.md` | The results report — **start here** |
-| `tests/` | Primitives, dataset integrity, matcher behaviour, metrics, end-to-end gates, and a named regression test for each of the 46 defects the audit found |
+I matched names five ways, built a dataset where the labels come from who the
+person *is* rather than from how similar the strings look, and measured the
+matchers with a cost function that treats a false positive as far worse than a
+false negative — because one is fraud accepted and the other is a customer sent
+to a support queue.
+
+The learned combiner wins: 25 false positives against the runner-up's 54, and
+0.695 precision at 99% recall against 0.310. The interesting part is not that it
+wins, it's *why the second-place algorithm is worth keeping anyway*, and the one
+case where the system still gets it wrong after two separate fixes.
 
 ## The five matchers
 
-1. **Exact (normalised tokens)** — the control. How far does cleaning alone go?
-2. **Token-set Jaccard** — the standard production baseline. Order-invariant.
-3. **Phonetic + Jaro-Winkler** — the standard "robust to spelling" answer.
-4. **Token-aligned weighted scorer** — hand-weighted; models order, initials,
-   dropped names and joint surnames, with prefix credit falling monotonically as
-   a short name's extension into a longer one grows.
-5. **Learned combiner** — logistic regression over features from all of the
-   above, scored out-of-fold.
+| | what it is | why it's here |
+|---|---|---|
+| Exact (normalised) | set equality after cleaning | the control — how far does cleaning alone get? 28% |
+| Token-set Jaccard | order-invariant token overlap | what production pipelines actually ship |
+| Phonetic + Jaro-Winkler | phonetic codes plus character similarity | the "robust to spelling" answer, and the one that's confidently wrong |
+| Token-aligned scorer | hand-weighted, positional token roles | the strongest thing you can build without training one |
+| Learned combiner | logistic regression over 23 features | the recommendation |
 
 ## Headline
 
-Precision at a fixed recall — the comparable metric, defined as the standard PR
-envelope `P(R) = max{ precision(r) : r >= R }`, so every value is attained by a
-real threshold and no row can rise with recall:
+Precision at a fixed recall, defined as the standard PR envelope
+`P(R) = max{ precision(r) : r >= R }` — every value below is attained by a real
+threshold, so no row can rise with recall:
 
 | algorithm | P@R=0.90 | P@R=0.99 | PR-AUC | cost/pair | FP @ recall≥0.90 |
 |---|---|---|---|---|---|
 | **Learned combiner** | **0.838** | **0.695** | **0.895** | **0.174** | 25 |
-| Phonetic + Jaro-Winkler | 0.764 | 0.340 | 0.824 | 0.421 | 39 |
 | Token-aligned weighted scorer | 0.702 | 0.310 | 0.801 | 0.397 | 54 |
+| Phonetic + Jaro-Winkler | 0.764 | 0.340 | 0.824 | 0.421 | 39 |
 | Token-set Jaccard | 0.463 | 0.283 | 0.706 | 0.717 | 152 |
 | Exact (normalised tokens) | 0.283 | 0.283 | 0.544 | 0.717 | 354 |
 
-Recommendation: ship the learned combiner with a three-band split at 0.919
-(auto-approve) and 0.053 (auto-reject), keeping the token-aligned scorer as a
-deterministic fallback. Seven of the learned model's 25 remaining false
-positives are pairs of people with byte-identical names — irreducible for any
-name-only matcher, and the strongest argument for adding a non-name signal.
+**Ship the learned combiner**, three bands: auto-approve at 0.919 (8.1% of pairs,
+all correct), auto-reject below 0.053 (51.6%, all correct), the rest to a human.
+Keep the token-aligned scorer as the fallback — not because it's close, but
+because it's deterministic and can't fail the way a model file can.
 
-Full numbers, thresholds, per-category failure breakdown, the cost sweep and the
-confidence interval are in [reports/results.md](reports/results.md).
+Seven of the 25 remaining false positives are pairs of people with
+byte-identical names. No name-only matcher will ever get those right, and it's
+the strongest argument for adding a date of birth or a document number.
+
+The paired bootstrap on cost between the top two comes out at +0.2227 per pair
+with a 95% interval of [-0.0102, +0.4777] — it spans zero, so on cost alone the
+two aren't statistically separable on 494 rows. The recommendation rests on the
+false-positive counts and the high-recall precision instead, not on that number.
+
+## Layout
+
+| Path | |
+|---|---|
+| `name_match/normalize.py` | name cleaning: diacritics, honorifics, `S/o` qualifiers, a partial transliteration lexicon |
+| `name_match/string_algos.py` | Levenshtein, Damerau-OSA, Jaro, Jaro-Winkler, n-gram overlap |
+| `name_match/phonetics.py` | Soundex and a Metaphone variant |
+| `name_match/algorithms.py` | the five matchers, one `score(a, b) -> 0..1` interface |
+| `name_match/dataset.py` | the identity model and the deterministic pair generator |
+| `name_match/features.py` | 23 features for the learned arm, symmetric in both arguments |
+| `name_match/model.py` | L2 logistic regression, batch gradient descent, strict artefact validation |
+| `name_match/evaluate.py` | cost, PR-AUC, precision-at-recall, paired bootstrap, bands |
+| `name_match/ablation.py` | leave-one-feature-out — which features are actually valuable |
+| `name_match/cli.py` | `generate` / `train` / `evaluate` / `report` / `all` / `ablate` |
+| `data/name_pairs.csv` | the dataset, with a commented header naming every category |
+| `reports/ablation.md` | what each feature is worth (optional, ~2 min to generate) |
+| `tests/` | 349 tests, including a named regression test for each of the 46 defects found while reviewing this |
+
+`python3 -m name_match.cli ablate` writes `reports/ablation.md`. It's slow
+because it refits the model once per feature, so it isn't part of `all`.
