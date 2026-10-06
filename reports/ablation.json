@@ -1,0 +1,237 @@
+{
+  "baseline_oof_cost": 0.17408906882591094,
+  "cost_ratio": 25.0,
+  "features": [
+    {
+      "feature": "token_dice",
+      "full_weight": -0.4546552181683596,
+      "oof_cost_delta": 0.038461538461538464,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.2125506072874494,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 19.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "coverage",
+      "full_weight": 0.2580496361443531,
+      "oof_cost_delta": 0.02834008097165991,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.20242914979757085,
+      "oof_fn_delta": 1.0,
+      "oof_fp_delta": -11.0,
+      "oof_recall_delta": -0.0071428571428571175
+    },
+    {
+      "feature": "phonetic_max",
+      "full_weight": -0.3078261491931168,
+      "oof_cost_delta": 0.02226720647773278,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.19635627530364372,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 11.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "soundex_full_match",
+      "full_weight": 0.5164838555278307,
+      "oof_cost_delta": 0.020242914979757082,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.19433198380566802,
+      "oof_fn_delta": 1.0,
+      "oof_fp_delta": -15.0,
+      "oof_recall_delta": -0.0071428571428571175
+    },
+    {
+      "feature": "phonetic_mean",
+      "full_weight": 0.5285626278560147,
+      "oof_cost_delta": 0.012145748987854255,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.1862348178137652,
+      "oof_fn_delta": -1.0,
+      "oof_fp_delta": 31.0,
+      "oof_recall_delta": 0.0071428571428571175
+    },
+    {
+      "feature": "damerau_ratio",
+      "full_weight": 0.30813516153632836,
+      "oof_cost_delta": 0.008097165991902827,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.18218623481781376,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 4.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "bigram_jaccard",
+      "full_weight": 0.6253100277325314,
+      "oof_cost_delta": 0.006072874493927127,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.18016194331983806,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 3.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "agreement",
+      "full_weight": 0.4932479377994299,
+      "oof_cost_delta": 0.0040485829959514,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.17813765182186234,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 2.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "order_bonus",
+      "full_weight": -0.15536897118617313,
+      "oof_cost_delta": 0.0040485829959514,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.17813765182186234,
+      "oof_fn_delta": -1.0,
+      "oof_fp_delta": 27.0,
+      "oof_recall_delta": 0.0071428571428571175
+    },
+    {
+      "feature": "has_initial_either",
+      "full_weight": 0.5122417486521914,
+      "oof_cost_delta": 0.0040485829959514,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.17813765182186234,
+      "oof_fn_delta": -1.0,
+      "oof_fp_delta": 27.0,
+      "oof_recall_delta": 0.0071428571428571175
+    },
+    {
+      "feature": "token_jaccard",
+      "full_weight": -0.32758066614331843,
+      "oof_cost_delta": 0.0020242914979757,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.17611336032388664,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 1.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "jaro_winkler_ordered",
+      "full_weight": 0.04157509587741192,
+      "oof_cost_delta": 0.0020242914979757,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.17611336032388664,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 1.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "prefix_ratio",
+      "full_weight": 0.11858521160226229,
+      "oof_cost_delta": 0.0020242914979757,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.17611336032388664,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 1.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "trigram_jaccard",
+      "full_weight": 0.46525271259079504,
+      "oof_cost_delta": 0.0,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.17408906882591094,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 0.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "lcs_ratio",
+      "full_weight": 0.0847823041697435,
+      "oof_cost_delta": 0.0,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.17408906882591094,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 0.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "dropped_qualifier",
+      "full_weight": 0.20850315468411335,
+      "oof_cost_delta": 0.0,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.17408906882591094,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": 0.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "exact_normalized",
+      "full_weight": -0.0607733791332756,
+      "oof_cost_delta": -0.0020242914979757276,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.1720647773279352,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": -1.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "same_token_count",
+      "full_weight": -0.16253326170840643,
+      "oof_cost_delta": -0.0020242914979757276,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.1720647773279352,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": -1.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "n_token_diff",
+      "full_weight": 0.2942722763668071,
+      "oof_cost_delta": -0.0040485829959514275,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.1700404858299595,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": -2.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "dropped_honorific",
+      "full_weight": 0.4955693055692537,
+      "oof_cost_delta": -0.006072874493927127,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.1680161943319838,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": -3.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "jaro_winkler_sorted",
+      "full_weight": 0.22999298634932275,
+      "oof_cost_delta": -0.014170040485829954,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.15991902834008098,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": -7.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "char_signal",
+      "full_weight": 0.22999298634932275,
+      "oof_cost_delta": -0.014170040485829954,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.15991902834008098,
+      "oof_fn_delta": 0.0,
+      "oof_fp_delta": -7.0,
+      "oof_recall_delta": 0.0
+    },
+    {
+      "feature": "length_ratio",
+      "full_weight": -0.4988680142321301,
+      "oof_cost_delta": -0.02631578947368421,
+      "oof_cost_with": 0.17408906882591094,
+      "oof_cost_without": 0.14777327935222673,
+      "oof_fn_delta": -1.0,
+      "oof_fp_delta": 12.0,
+      "oof_recall_delta": 0.0071428571428571175
+    }
+  ],
+  "n_features": 23
+}
