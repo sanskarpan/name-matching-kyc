@@ -10,7 +10,9 @@ library alone. There is no `pip install` step in this project.
 ## 1. How to run it
 
 **Prerequisite:** Python 3.9 or newer. That is the entire dependency list.
-Verified on CPython 3.14.7 (macOS). Nothing platform-specific is used.
+Verified end to end on CPython 3.14.7 (macOS) and on CPython 3.9.6, the
+system interpreter — 351 tests pass on both and both produce the same dataset and
+the same report. Nothing platform-specific is used.
 
 ```bash
 # from the repository root, with nothing installed
@@ -82,9 +84,19 @@ cross-validation independently, which is the honest cost of not threading scores
 through the two phases.
 
 **Determinism:** the dataset generator, the cross-validation split and the
-bootstrap all use fixed seeds or no RNG at all. Two runs produce a byte-identical
-CSV and identical scores. `tests/test_end_to_end.py::TestReproducibility`
-asserts it.
+bootstrap all use fixed seeds or no RNG at all. Two runs on one interpreter
+produce a byte-identical CSV, model and report.
+
+Across *interpreter versions* the dataset and the report are still byte-identical,
+but `data/model.json` differs in the last one or two significant figures
+(`bias` -2.118369724235994 on 3.9.6 versus -2.118369724235997 on 3.14.7).
+Floating-point addition is not associative and `libm` is not bit-identical
+between builds, so a 1200-step gradient descent lands a few ulps apart. I checked
+that none of it is visible: `reports/results.md` is byte-identical across both,
+because the metrics are quoted to three decimals. Claiming byte-identity across
+versions would have been a stronger claim than I actually verified.
+`tests/test_end_to_end.py::TestReproducibility` asserts the within-interpreter
+case.
 
 ### Why standard library only
 

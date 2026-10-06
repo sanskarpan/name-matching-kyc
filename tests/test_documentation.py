@@ -474,23 +474,38 @@ class TestDocumentationExists(unittest.TestCase):
         import pathlib
         import sys
 
-        # `sys.stdlib_module_names` arrived in 3.10. This module must keep
-        # importing on the 3.9 floor that the documentation claims, so fall
-        # back to a curated allow-list of the only third-party-shaped names a
-        # project like this would plausibly import.
-        # `__future__` and `typing` are the two that were missing: every
-        # module here does `from __future__ import annotations`, so on the 3.9
-        # floor -- the version the documentation claims -- this test reported
-        # 22 phantom third-party imports and failed on the exact machine the
-        # brief describes having ("only the language runtime installed").
-        stdlib = set(getattr(sys, "stdlib_module_names", ())) or {
-            "__future__", "abc", "argparse", "ast", "collections",
-            "contextlib", "csv", "dataclasses", "difflib", "functools", "io",
-            "itertools", "json", "math", "os", "pathlib", "random", "re",
-            "shutil", "string", "subprocess", "sys", "tempfile", "textwrap",
-            "typing", "unicodedata", "unittest",
-        }
+        # Ask the interpreter where each name resolves, rather than keeping a
+        # list of standard-library module names.
+        #
+        # Two earlier versions of this test each used a list and both were
+        # wrong: a curated fallback for the 3.9 floor omitted `__future__` and
+        # `typing` (so every module reported a phantom third-party import on
+        # the documented floor), and listing the stdlib *directory* broke on
+        # versioned extension modules like `unicodedata.cpython-39-darwin.so`.
+        # A list is the wrong shape for this question; the interpreter always
+        # has the right answer.
+        import importlib.util
+
+        third_party_markers = ("site-packages", "dist-packages")
         local = {"name_match"}
+
+        def is_third_party(name: str) -> bool:
+            if name in local:
+                return False
+            try:
+                spec = importlib.util.find_spec(name)
+            except (ImportError, ValueError):
+                return True  # not importable at all: worth reporting
+            if spec is None:
+                return True
+            places = []
+            if spec.origin:
+                places.append(spec.origin)
+            places.extend(spec.submodule_search_locations or ())
+            return any(marker in place.replace("\\", "/")
+                       for place in places
+                       for marker in third_party_markers)
+
         offenders: list[str] = []
 
         for source in list(pathlib.Path(REPO_ROOT, "name_match").glob("*.py")) + \
@@ -507,7 +522,7 @@ class TestDocumentationExists(unittest.TestCase):
                 else:
                     continue
                 for name in names:
-                    if name not in stdlib and name not in local:
+                    if is_third_party(name):
                         offenders.append(f"{source.name}: {name}")
 
         self.assertEqual(offenders, [],
