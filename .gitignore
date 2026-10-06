@@ -5,3 +5,7 @@ __pycache__/
 venv/
 .mypy_cache/
 .pytest_cache/
+
+# The original brief: kept locally as a reference for this submission, but
+# deliberately not committed.
+assignment.md
