@@ -693,6 +693,8 @@ class LearnedCombiner:
         if left.is_empty() or right.is_empty():
             return MatchResult(0.0, {"empty": 1.0})
 
+        if self._model.weights and tuple(self._model.feature_names) != FEATURE_NAMES:
+            raise ValueError("learned model feature order does not match the extractor; refit the model")
         vector, components = extract_features(name_a, name_b)
         probability = self._model.predict_proba(vector)
         return MatchResult(

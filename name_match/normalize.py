@@ -17,11 +17,10 @@ Pipeline
 
 Important honesty note about the lexicon
 ---------------------------------------
-This lexicon is a hand-written domain resource, the way a production system
-would ship one. It is intentionally **not** derived from the evaluation
-dataset. The dataset contains spelling variants that the lexicon does not know
-about, so we can honestly report accuracy on *held-out transliteration* pairs
-rather than reporting a trivially inflated number. See NOTES.md.
+This lexicon is a hand-written, partial domain resource and was revised while
+reviewing this exercise's dataset. Some evaluation spellings are absent from
+it, which tests lexicon coverage; those pairs are not an independent model
+holdout. Generalisation needs separately collected data. See NOTES.md.
 """
 
 from __future__ import annotations
@@ -428,7 +427,7 @@ def normalize(name: str) -> NormalizedName:
     """Normalise a raw name string into a :class:`NormalizedName`.
 
     >>> normalize("Smt. S. Suresh Kumar Sharma, S/o Ramesh Chandra").tokens
-    ('suresh', 'kumar', 'sharma')
+    ('s', 'suresh', 'kumar', 'sharma')
     """
     if not name or not name.strip():
         return NormalizedName(raw=name or "", tokens=(), canonical=(), dropped=(),
@@ -450,7 +449,7 @@ def normalize(name: str) -> NormalizedName:
     # rather than dropped on the floor, because discarding both alike is how two
     # byte-identical Devanagari names end up scoring zero.
     unreadable = [t for t in raw_tokens
-                  if not _NON_ALNUM.sub("", t) and _has_letters(t)]
+                  if any(ch.isalpha() and not ch.isascii() for ch in t)]
     raw_tokens = [t for t in raw_tokens if _NON_ALNUM.sub("", t)]
 
     kept: list[str] = []

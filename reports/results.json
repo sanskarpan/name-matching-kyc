@@ -1990,6 +1990,7 @@
   "metric": {
     "cost_fn": 25.0,
     "cost_fp": 1.0,
+    "cost_sweep_ratio_order": "c_FP:c_FN",
     "name": "asymmetric misclassification cost per pair"
   },
   "recommended": "learned"

@@ -94,6 +94,8 @@ class LogisticRegression:
                 raise ValueError(
                     f"row {index} has {len(row)} features, expected {n_features}; "
                     "a ragged feature matrix silently drops or reuses columns")
+            if any(not math.isfinite(value) for value in row):
+                raise ValueError(f"row {index} contains a non-finite feature")
         # `repr` is used for the key so a mixed-type label list reports the
         # offending values instead of raising TypeError out of `sorted`.
         bad_labels = sorted({repr(label) for label in labels
@@ -200,6 +202,8 @@ class LogisticRegression:
                 f"feature vector has {len(row)} values but the model was fitted "
                 f"on {len(self.weights)}; the artefact is stale or the feature "
                 "order changed")
+        if any(not math.isfinite(value) for value in row):
+            raise ValueError("feature vector contains a non-finite value")
         scaled = [
             (row[j] - self.means[j]) / self.stds[j] for j in range(len(self.weights))
         ]
@@ -211,7 +215,7 @@ class LogisticRegression:
         """``(feature_name, standardised_weight)`` sorted by magnitude.
 
         These are coefficients on *standardised* features, so magnitudes are
-        directly comparable: a weight of 0.8 means half a standard deviation of
+        directly comparable: a weight of 0.8 means one standard deviation of
         that feature moves the log-odds by 0.8.
         """
         names = self.feature_names or tuple(f"f{i}" for i in range(len(self.weights)))
@@ -267,6 +271,31 @@ class LogisticRegression:
         with open(path, "r", encoding="utf-8") as handle:
             payload = json.load(handle)
 
+        if not isinstance(payload, dict):
+            raise ValueError(f"corrupt model artefact at {path}: expected an object")
+        required = set(cls().to_dict())
+        if not required <= payload.keys():
+            raise ValueError(f"corrupt model artefact at {path}: missing fields")
+        for key in ("weights", "means", "stds", "feature_names"):
+            if not isinstance(payload[key], list):
+                raise ValueError(f"corrupt model artefact at {path}: {key} must be a list")
+
+        width = len(payload["weights"])
+        for key in ("means", "stds"):
+            if len(payload[key]) != width:
+                raise ValueError(f"corrupt model artefact at {path}: weights/{key} length mismatch")
+        if payload["feature_names"] and len(payload["feature_names"]) != width:
+            raise ValueError(f"corrupt model artefact at {path}: feature names length mismatch")
+        if any(not isinstance(name, str) for name in payload["feature_names"]):
+            raise ValueError(f"corrupt model artefact at {path}: feature names must be strings")
+        numeric = [payload["bias"], payload["learning_rate"], payload["l2"],
+                   *payload["weights"], *payload["means"], *payload["stds"]]
+        if any(not isinstance(value, (int, float)) or not math.isfinite(value)
+               for value in numeric):
+            raise ValueError(f"corrupt model artefact at {path}: non-finite or non-numeric values")
+        if any(value <= 0 for value in payload["stds"]):
+            raise ValueError(f"corrupt model artefact at {path}: standard deviations must be positive")
+
         if expected_features is not None:
             saved = tuple(payload.get("feature_names", ()))
             if saved != tuple(expected_features):
@@ -276,11 +305,6 @@ class LogisticRegression:
                     f"{list(expected_features)[:4]}...; refit the model "
                     "(python3 -m name_match.cli train) rather than loading a "
                     "stale one")
-
-        weights = payload["weights"]
-        if len(weights) != len(payload.get("means", weights)):
-            raise ValueError(f"corrupt model artefact at {path}: weights/means "
-                             "length mismatch")
 
         return cls(
             learning_rate=payload["learning_rate"],

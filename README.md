@@ -10,13 +10,14 @@ evaluation, and a written recommendation. **Standard library only** — Python
 ## Run it
 
 ```bash
-python3 run.py all      # regenerate, train, evaluate, report  (~15s)
-python3 run.py test     # 349 tests                               (~4-5 min)
+python3 run.py all --test  # regenerate, print comparison, report, run tests
 ```
 
 `run.py all` rewrites `data/name_pairs.csv`, `data/model.json`,
-`reports/results.md` and `reports/results.json` from scratch. The whole pipeline
-is deterministic: same input, byte-identical output, no RNG.
+`reports/results.md` and `reports/results.json` from scratch. The pipeline
+is deterministic on the same Python version: same input, byte-identical
+output, fixed bootstrap seed. Floating-point serialization can differ slightly
+between Python versions.
 
 **Start with [reports/results.md](reports/results.md)** — every table is there.
 
@@ -27,11 +28,12 @@ For the reasoning rather than the numbers, read
 
 I matched names five ways, built a dataset where the labels come from who the
 person *is* rather than from how similar the strings look, and measured the
-matchers with a cost function that treats a false positive as far worse than a
-false negative — because one is fraud accepted and the other is a customer sent
-to a support queue.
+matchers with an explicit review-queue cost: unnecessary review costs 1,
+while missing a genuine match costs 25. Direct identity approval requires a
+separate precision constraint; these triage costs do not price fraud acceptance.
 
-The learned combiner wins: 25 false positives against the runner-up's 54, and
+The learned combiner has the best observed triage cost: 25 false positives
+at the 90%-recall floor against token alignment's 54, and
 0.695 precision at 99% recall against 0.310. The interesting part is not that it
 wins, it's *why the second-place algorithm is worth keeping anyway*, and the one
 case where the system still gets it wrong after two separate fixes.
@@ -40,7 +42,7 @@ case where the system still gets it wrong after two separate fixes.
 
 | | what it is | why it's here |
 |---|---|---|
-| Exact (normalised) | set equality after cleaning | the control — how far does cleaning alone get? 28% |
+| Exact (normalised) | set equality after cleaning | the control for the effect of normalisation |
 | Token-set Jaccard | order-invariant token overlap | what production pipelines actually ship |
 | Phonetic + Jaro-Winkler | phonetic codes plus character similarity | the "robust to spelling" answer, and the one that's confidently wrong |
 | Token-aligned scorer | hand-weighted, positional token roles | the strongest thing you can build without training one |
@@ -60,19 +62,23 @@ threshold, so no row can rise with recall:
 | Token-set Jaccard | 0.463 | 0.283 | 0.706 | 0.717 | 152 |
 | Exact (normalised tokens) | 0.283 | 0.283 | 0.544 | 0.717 | 354 |
 
-**Ship the learned combiner**, three bands: auto-approve at 0.919 (8.1% of pairs,
-all correct), auto-reject below 0.053 (51.6%, all correct), the rest to a human.
-Keep the token-aligned scorer as the fallback — not because it's close, but
-because it's deterministic and can't fail the way a model file can.
+**Choose the learned combiner.** Its proposed bands on OOF scores are auto-approve
+at 0.919 (8.1% of pairs, all correct in this sample), auto-reject below 0.053
+(51.6%, all correct in this sample), and review between them. Exact cut-offs
+are in the JSON report. Independently validate thresholds for the refitted
+model before production. If loading fails, use token alignment to prioritise
+review and disable automatic decisions.
 
 Seven of the 25 remaining false positives are pairs of people with
 byte-identical names. No name-only matcher will ever get those right, and it's
 the strongest argument for adding a date of birth or a document number.
 
 The paired bootstrap on cost between the top two comes out at +0.2227 per pair
-with a 95% interval of [-0.0102, +0.4777] — it spans zero, so on cost alone the
-two aren't statistically separable on 494 rows. The recommendation rests on the
-false-positive counts and the high-recall precision instead, not on that number.
+with a 95% interval of [-0.0102, +0.4777]. It spans zero, so superiority on
+cost is not established; that does not prove equivalence. The recommendation
+also considers observed high-recall precision. Folds split pairs rather than
+identities and thresholds are tuned on pooled scores, so this synthetic-data
+evaluation does not establish generalisation to unseen customers.
 
 ## Layout
 
@@ -90,7 +96,7 @@ false-positive counts and the high-recall precision instead, not on that number.
 | `name_match/cli.py` | `generate` / `train` / `evaluate` / `report` / `all` / `ablate` |
 | `data/name_pairs.csv` | the dataset, with a commented header naming every category |
 | `reports/ablation.md` | what each feature is worth (optional, ~2 min to generate) |
-| `tests/` | 349 tests, including a named regression test for each of the 46 defects found while reviewing this |
+| `tests/` | unit, regression, documentation and complete-pipeline checks |
 
 `python3 -m name_match.cli ablate` writes `reports/ablation.md`. It's slow
 because it refits the model once per feature, so it isn't part of `all`.

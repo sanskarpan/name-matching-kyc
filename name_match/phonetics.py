@@ -5,7 +5,7 @@ algorithms) so the package stays dependency-free.
 
 Why phonetics matter here: the single largest source of *false positives* in
 name matching is that orthographically different names are pronounced the
-same. Soundex collapses "Sharma" and "Sarma" and "Saxena" to the same code,
+same. Soundex collapses "Sharma" and "Sarma" to the same code,
 which is precisely the trap we want to measure and report.
 """
 

@@ -75,6 +75,8 @@ def kfold_indices(n: int, folds: int = CV_FOLDS) -> list[tuple[list[int], list[i
     directly by ``test_folds_have_similar_positive_rates`` instead of being
     claimed here.
     """
+    if not 2 <= folds <= n:
+        raise ValueError("cross-validation requires 2 <= folds <= number of pairs")
     assignments = [[] for _ in range(folds)]
 
     for index in range(n):
@@ -104,10 +106,10 @@ def cross_validated_scores(pairs: Sequence[NamePair],
     pooled out-of-fold scores of the whole dataset (see :func:`analyse`). That
     is the standard "cross-validate the score, then tune the threshold"
     arrangement; it does leak threshold-selection information across folds, and
-    a nested scheme would not. With a threshold chosen from this many rows and
-    reported alongside its bootstrap interval, the leak is small -- but it is a
-    leak, and the honest description is "out-of-fold scores, threshold tuned on
-    the pooled scores", not "the threshold was chosen on other folds".
+    a nested scheme would not. The magnitude of selection bias is not measured
+    here; the bootstrap does not remove it. The honest description is
+    "out-of-fold scores, threshold tuned on the pooled scores", not "the
+    threshold was chosen on other folds".
     """
     matrix = [extract_features(row.name_a, row.name_b)[0] for row in pairs]
     labels = [row.label for row in pairs]
@@ -186,7 +188,8 @@ def build_score_sets(pairs: Sequence[NamePair],
         extras["cv"] = {"folds": 0, "full_model_loss": full_model.final_loss, "model": full_model}
 
     score_sets.append(evaluate_module.ScoreSet(
-        key="learned", label="Learned combiner (logistic regression, out-of-fold)",
+        key="learned", label=("Learned combiner (logistic regression, out-of-fold)"
+                              if use_cv else "Learned combiner (logistic regression, in-sample)"),
         scores=learned_scores, labels=[row.label for row in pairs], rows=list(pairs),
     ))
     return score_sets, extras
@@ -216,9 +219,9 @@ def analyse(score_sets: Sequence[evaluate_module.ScoreSet],
                     score_set.scores, score_set.labels, level)
                 for level in PRECISION_RECALL_LEVELS
             },
-            "optimal": optimal.as_row(),
-            "zero_fp": zero_fp.as_row(),
-            "at_recall_floor": constrained.as_row(),
+            "optimal": optimal.as_row(cost_fp, cost_fn),
+            "zero_fp": zero_fp.as_row(cost_fp, cost_fn),
+            "at_recall_floor": constrained.as_row(cost_fp, cost_fn),
             "bands": evaluate_module.three_band_split(
                 score_set.scores, score_set.labels,
                 report["reject_below"], report["approve_at_or_above"]),
@@ -367,7 +370,7 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
         [
             [
                 results[s.key]["label"],
-                _fmt(results[s.key]["zero_fp"]["threshold"]),
+                _fmt(results[s.key]["zero_fp"]["threshold"], 9),
                 results[s.key]["zero_fp"]["fp"],
                 results[s.key]["zero_fp"]["fn"],
                 _fmt(results[s.key]["zero_fp"]["recall"]),
@@ -387,7 +390,7 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
                 score_set.scores, score_set.labels, 1.0, ratio)
             row.append(_fmt(confusion.cost_per_pair(1.0, ratio)))
         sweep_rows.append(row)
-    print(_markdown_table(["c_FN : c_FP"] + [results[s.key]["label"] for s in score_sets],
+    print(_markdown_table(["c_FP : c_FN"] + [results[s.key]["label"] for s in score_sets],
                          sweep_rows))
 
     print()
@@ -461,8 +464,8 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
         elif delta["ci_high"] < 0:
             verdict = "B is significantly cheaper; the headline ranking is wrong"
         else:
-            verdict = ("NOT significant: the 95% CI includes zero, so on this "
-                       "dataset the two are effectively tied")
+            verdict = ("NOT significant: the 95% CI includes zero; this does "
+                       "not establish equivalence between the algorithms")
         print(f"  verdict: {verdict}")
 
     return 0
@@ -583,6 +586,7 @@ def cmd_report(args: argparse.Namespace) -> int:
             "name": "asymmetric misclassification cost per pair",
             "cost_fp": evaluate_module.DEFAULT_COST_FP,
             "cost_fn": evaluate_module.DEFAULT_COST_FN,
+            "cost_sweep_ratio_order": "c_FP:c_FN",
         },
         "algorithms": {
             key: {
@@ -714,7 +718,9 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
     lines.append("")
     lines.append(f"Cost function `C = {evaluate_module.DEFAULT_COST_FP:.0f}*FP + "
                  f"{evaluate_module.DEFAULT_COST_FN:.0f}*FN`, minimised over the threshold. "
-                 "Lower is better; this is the metric the recommendation is based on.")
+                 "Lower is better under the illustrative review-queue costs: an unnecessary "
+                 "review costs 1 and a missed genuine match costs 25. This is not a "
+                 "cost model for approving identity without review.")
     lines.append("")
     ordered = sorted(results.items(), key=lambda kv: kv[1]["optimal"]["cost_per_pair"])
     lines.append(_markdown_table(
@@ -744,10 +750,9 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
             f"point sits at or near full recall -- but not exactly at it. "
             f"{len(at_full)} of {len(ordered)} algorithms {verb} recall 1.000 "
             f"({', '.join(at_full)}); the rest stop short ({short_list}). The "
-            f"recall column is in the table, and it is why the cost column alone "
-            f"cannot be read as a ranking: each algorithm is priced at a slightly "
-            f"different operating point. That is what the next two tables exist to "
-            f"fix."
+            f"costs are comparable under the same cost function and dataset even "
+            f"though each algorithm chooses a different operating point. The "
+            f"next two tables show the error trade-offs at a common recall floor."
         )
     elif at_full:
         lines.append(
@@ -763,14 +768,15 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
             "Note the shape of this table: at `c_FN = 25` the cost-optimal point "
             "does not reach full recall for any algorithm, and each stops at a "
             "different one (see the recall column). The cost column is therefore not "
-            "a like-for-like comparison, which is why the next two tables exist."
+            "a comparison at equal recall; costs remain comparable under the common "
+            "cost function. The next two tables compare recall constraints."
         )
     lines.append("")
     lines.append("Thresholds:")
     lines.append("")
     lines.append(_markdown_table(
         ["algorithm", "optimal threshold", "zero-FP threshold"],
-        [[res["label"], _fmt(res["optimal"]["threshold"]), _fmt(res["zero_fp"]["threshold"])]
+        [[res["label"], _fmt(res["optimal"]["threshold"]), _fmt(res["zero_fp"]["threshold"], 9)]
          for _key, res in ordered],
     ))
     lines.append("")
@@ -779,22 +785,21 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
     lines.append("## Precision at a fixed recall (the comparable metric)")
     lines.append("")
     lines.append(
-        "This is the cross-algorithm comparison to trust, and it exists because the "
-        "cost table above cannot be read as a ranking on its own. At "
-        f"`c_FN = {evaluate_module.DEFAULT_COST_FN:.0f}` each algorithm's "
-        "cost-optimal threshold sits wherever that cost function puts it -- as the "
-        "recall column above shows, at five different operating points rather than "
-        "one -- so the costs are not comparable to each other."
+        "Cost compares algorithms under a stated business assumption. Precision "
+        "at a recall floor answers a complementary question: what precision can "
+        "each algorithm achieve while retaining at least the requested fraction "
+        "of genuine matches? This comparison does not require choosing error costs."
     )
     lines.append("")
     lines.append(
-        "Precision at a common recall level removes that problem: every algorithm "
+        "Precision at a common recall floor means every algorithm "
         "answers the identical question, regardless of how coarse its scores are. The "
         "value is the standard PR envelope `P(R) = max{ precision(r) : r >= R }`, so "
         "two properties hold by construction. Every published value is attained by "
         "some real threshold -- nothing is interpolated into existence -- and the row "
-        "is non-increasing in recall, because demanding more recall can only admit "
-        "more items and therefore only add false positives."
+        "is non-increasing in recall because increasing the recall floor shrinks "
+        "the set of feasible thresholds over which the maximum is taken. Raw "
+        "precision itself can rise or fall as a threshold is lowered."
     )
     lines.append("")
     lines.append(_markdown_table(
@@ -878,7 +883,7 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
     lines.append(_markdown_table(
         ["algorithm", "threshold", "FP", "FN", "recall", "precision", "cost/pair (c_FN=25)"],
         [
-            [res["label"], _fmt(res["zero_fp"]["threshold"]), res["zero_fp"]["fp"],
+            [res["label"], _fmt(res["zero_fp"]["threshold"], 9), res["zero_fp"]["fp"],
              res["zero_fp"]["fn"], _fmt(res["zero_fp"]["recall"]),
              _fmt(res["zero_fp"]["precision"]),
              _fmt(res["zero_fp"]["cost_per_pair"])]
@@ -900,31 +905,29 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
         if not attainable:
             no_zero_fp.append(_key)
     lines.append(
-        "The last column is the whole argument against shipping a hard zero-FP "
-        "policy on name evidence alone. Read it together with the `recall` column, "
-        "because the two move together: a zero-false-positive threshold has to sit "
-        "at the bottom of the positive score distribution, so every genuine match "
-        "it lets through is one it also had to catch, and the recall it achieves is "
-        "the price."
+        "A zero-FP threshold must lie above every negative score. It may therefore "
+        "exclude many genuine matches as well. The recall column shows that price "
+        "on this dataset; observed zero errors are not a production guarantee. "
+        "A displayed threshold of `1.000000001` is above the score range and "
+        "rejects every pair, unlike a threshold of exactly `1.0`."
     )
     if no_zero_fp:
         lines.append("")
         lines.append(
             f"**{len(no_zero_fp)} of {len(ordered)} algorithms have no zero-false-positive "
-            f"threshold at all.** Not an expensive trade-off -- an *infeasible* one: "
-            f"some negative in the dataset outscores every positive, so no cut-off "
+            f"threshold that accepts any pair.** A negative ties or exceeds the "
+            f"maximum positive score, so no cut-off "
             f"separates them. Those algorithms are marked `FP = 0` at the degenerate "
             f"reject-everything threshold, which is the only FP-free point they have, "
-            f"and it has recall 0.000 by construction. The distinction that matters "
-            f"for a policy is *zero false positives among pairs that reach manual "
-            f"review*, which is achievable; *zero false positives overall* is not, "
-            f"as long as two different people can share a name."
+            f"and it has recall 0.000 by construction. Manual review needs "
+            f"independent identity evidence; a reviewer cannot distinguish two "
+            f"different people from an identical name alone."
         )
     lines.append("")
     lines.append("")
 
     # -- sweep ------------------------------------------------------------
-    lines.append("## Cost sensitivity to the c_FN : c_FP ratio")
+    lines.append("## Cost sensitivity to the c_FP : c_FN ratio")
     lines.append("")
     lines.append(
         "Every algorithm is measured with the same cost function at seven different "
@@ -979,7 +982,7 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
     lines.append("")
     algorithms = [res["label"] for _key, res in ordered]
     lines.append(_markdown_table(
-        ["c_FN : c_FP"] + algorithms,
+        ["c_FP : c_FN"] + algorithms,
         [
             [ratio] + [_fmt(values[res_key]["cost_per_pair"])
                        for res_key in [k for k, _ in ordered]]
@@ -994,15 +997,15 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
     lines.append("The cost-optimal threshold is the right threshold for *triaging* a "
                  "queue. It is not the right threshold for *acting without a human*, "
                  "because the cost of a false positive differs depending on whether "
-                 "anyone is still in the loop. So the shipped configuration uses two "
+                 "anyone is still in the loop. The proposed configuration uses two "
                  "boundaries chosen from opposite ends:")
     lines.append("")
     lines.append(f"- **auto-approve** at or above the *precision* cut-off: the lowest "
-                 f"score at which at least {BAND_TARGET_PRECISION:.0%} of auto-approved "
+                 f"score at which at least {BAND_TARGET_PRECISION:.0%} of observed auto-approved "
                  f"pairs really are matches.")
     lines.append("- **auto-reject** below the *recall* cut-off: the **lowest** score that "
-                 "any genuine match in the data reached. Anything below it cannot be a "
-                 "true match, so nothing genuine is auto-rejected. (It is the lowest, "
+                 "any genuine match in the data reached. No observed true match is below "
+                 "it, so nothing genuine in this sample is auto-rejected. (It is the lowest, "
                  "not the highest: the cut-off is the floor of the positive score "
                  "distribution.)")
     lines.append("- **everything between goes to a human.**")
@@ -1052,7 +1055,9 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
         f"{BAND_TARGET_PRECISION:.0%} precision at all, so the auto-approve cut-off is "
         f"the most precise one available rather than a compliant one. The "
         f"`of which matches` column beside it is the number that actually matters; "
-        f"the stated rule was not met."
+        f"the stated rule was not met. These fallback cut-offs are diagnostics, "
+        "not approval rules. Even when the observed target is met, independent "
+        "validation is needed before production use."
     )
     lines.append("")
 
@@ -1061,7 +1066,8 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
         lines.append("## Is the top algorithm actually better than the runner-up?")
         lines.append("")
         lines.append("Paired bootstrap over 2000 resamples of the dataset, comparing "
-                     "per-pair cost at each algorithm's own optimal threshold.")
+                     "per-pair cost at each algorithm's own optimal threshold, held "
+                     "fixed across resamples.")
         lines.append("")
         lines.append(f"- mean cost delta (runner-up minus top): **{bootstrap['mean_delta']:+.4f}** per pair")
         lines.append(f"- 95% confidence interval: **[{bootstrap['ci_low']:+.4f}, {bootstrap['ci_high']:+.4f}]**")
@@ -1078,11 +1084,10 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
                        "above is wrong. Fix the ranking before drawing any conclusion.")
         else:
             verdict = ("**The difference is not statistically significant at 95%.** The "
-                       "95% interval spans zero, so on this dataset the two are "
-                       "effectively tied on cost. The headline table still orders them, "
-                       "but the ordering should not be treated as evidence on its own, "
-                       "and the simpler algorithm should be preferred on grounds other "
-                       "than this measurement.")
+                       "95% interval spans zero. This does not establish equivalence "
+                       "or prove the simpler matcher is better. The recommendation "
+                       "uses observed cost together with high-recall precision, "
+                       "subject to validation on independent data.")
         lines.append(f"**Verdict:** {verdict}")
         lines.append("")
 
@@ -1099,7 +1104,7 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
         f"**False positives at a matched operating point (recall >= {RECALL_FLOOR:.2f}, "
         "lowest false-positive count each algorithm can reach).** This is the "
         "precision side: how many *different people* each algorithm would wrongly "
-        "accept while still catching 90% of genuine matches."
+        "flag as matches while still catching 90% of genuine matches."
     )
     lines.append("")
     lines.append(_markdown_table(
@@ -1109,8 +1114,8 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
     ))
     lines.append("")
     lines.append(
-        f"**False negatives at the same operating point** -- genuine customers each "
-        "algorithm would send to manual review."
+        f"**False negatives at the same operating point** -- genuine matches each "
+        "binary threshold misses."
     )
     lines.append("")
     lines.append(_markdown_table(
@@ -1142,13 +1147,15 @@ def render_markdown(payload: dict, pairs: Sequence[NamePair],
         lines.append(
             "**What this does not cover.** The *operating threshold* is chosen once, "
             "afterwards, from the pooled out-of-fold scores of the whole dataset -- not "
-            "per fold. That is the standard arrangement for tuning a threshold on "
-            "cross-validated scores, and it does mean threshold-selection information "
-            "is shared across folds. A nested scheme would not, and would cost five "
-            "times as much. With the threshold reported alongside a bootstrap interval "
-            "over the dataset as a whole, the leak is small -- but describing it as "
-            "\"the threshold is chosen on the other folds\" would be false, so it is "
-            "not described that way."
+            "per fold. Threshold selection is therefore optimistic by an unmeasured "
+            "amount. Folds split pairs rather than identities, so other pairs from "
+            "the same person can be in training. The normaliser and scorer were also "
+            "developed using this synthetic dataset. These results do not measure "
+            "generalisation to unseen identities. The row-level bootstrap holds "
+            "thresholds fixed and assumes independent pairs; shared identities "
+            "violate that assumption. It is a descriptive interval, not a guarantee. "
+            "The full saved model is refitted on all rows, so its scores need "
+            "separate threshold validation before applying these OOF cut-offs."
         )
         lines.append("")
         if "fold_train_losses" in cv:
@@ -1271,6 +1278,7 @@ def cmd_ablate(args: argparse.Namespace) -> int:
     while lines and lines[-1] == "":
         lines.pop()
     md = "\n".join(lines) + "\n"
+    os.makedirs(os.path.dirname(args.ablation_json) or ".", exist_ok=True)
     os.makedirs(os.path.dirname(args.ablation_markdown) or ".", exist_ok=True)
     with open(args.ablation_json, "w", encoding="utf-8", newline="\n") as handle:
         json.dump(_json_safe(report), handle, indent=2, sort_keys=True,

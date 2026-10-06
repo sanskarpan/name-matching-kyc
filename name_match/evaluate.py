@@ -3,25 +3,23 @@
 Metric design is the substance of this exercise, so it is worth being explicit
 about what is computed and why.
 
-Primary metric: **asymmetric misclassification cost at a chosen operating
-point**, not accuracy and not F1.
+Primary metric: **asymmetric triage cost at a chosen operating point**.
 
-Why not accuracy: the evaluation set is 28% positive / 72% negative, so
-"always predict non-match" scores 72%. Accuracy is not informative here
-and actively misleading.
-
-Why not F1: F1 weights a false positive and a false negative equally. In
-identity verification they are not equally costly. A false positive accepts a
-fraudster's document as belonging to an existing customer -- unrecoverable,
-regulatory exposure, potential account takeover. A false negative routes a
-legitimate customer to manual review -- friction, an extra document upload, a
-support ticket, and it is fully recoverable. So the cost function is
+A false positive is a different person's name flagged as a possible match; a
+false negative is a genuine match missed. If these scores directly approved
+identity, false positives would be the greater risk. The baseline here instead
+models a review queue: a false positive costs extra review, while a false
+negative risks excluding a genuine customer from the queue.
 
     C = c_FP * FP + c_FN * FN
 
-with ``c_FN = 25 * c_FP`` as the baseline, and the whole analysis is repeated
-across a sweep of ratios from 1:1 to 1:100 so no conclusion rests on one
-arbitrary number.
+The illustrative triage assumption is ``c_FP = 1, c_FN = 25``. It is not a
+fraud-acceptance cost model. Automatic decisions use separate precision and
+recall constraints in the three-band analysis. The sensitivity sweep varies
+``c_FN/c_FP`` from 1 to 100; it does not test a false-positive-heavy policy.
+Accuracy and F1 are reported only as supporting metrics: neither expresses
+these unequal business costs. Precision at a recall floor measures the review
+burden while requiring that genuine matches remain discoverable.
 
 Secondary metrics: PR-AUC (preferred over ROC-AUC because the evaluation set is
 28% positive and 72% negative, so ROC's false-positive axis is dominated by the
@@ -61,8 +59,8 @@ __all__ = [
     "DEFAULT_COST_FP",
 ]
 
-#: Baseline cost ratio. A false negative (legitimate customer sent to manual
-#: review) is treated as 25x cheaper than a false positive (fraud accepted).
+#: Illustrative triage costs: missing a genuine match costs 25 times an
+#: unnecessary review. Automatic approval has a separate precision constraint.
 DEFAULT_COST_FN = 25.0
 DEFAULT_COST_FP = 1.0
 
@@ -141,7 +139,8 @@ class Confusion:
         total = self.tp + self.fp + self.tn + self.fn
         return self.cost(cost_fp, cost_fn) / total if total else float("inf")
 
-    def as_row(self) -> dict[str, float]:
+    def as_row(self, cost_fp: float = DEFAULT_COST_FP,
+               cost_fn: float = DEFAULT_COST_FN) -> dict[str, float]:
         return {
             "threshold": self.threshold,
             "tp": self.tp,
@@ -152,8 +151,8 @@ class Confusion:
             "recall": self.recall,
             "f1": self.f1,
             "accuracy": self.accuracy,
-            "cost": self.cost(),
-            "cost_per_pair": self.cost_per_pair(),
+            "cost": self.cost(cost_fp, cost_fn),
+            "cost_per_pair": self.cost_per_pair(cost_fp, cost_fn),
         }
 
 
@@ -161,6 +160,15 @@ class Confusion:
 #: threshold. Large enough to clear any finite score, small enough not to
 #: collide with a legitimate neighbouring threshold.
 _ABOVE_ALL_SCORES = 1e-9
+
+
+def _validate_inputs(scores: Sequence[float], labels: Sequence[int]) -> None:
+    if len(scores) != len(labels):
+        raise ValueError("scores and labels must have the same length")
+    if any(not math.isfinite(score) for score in scores):
+        raise ValueError("scores must be finite (no NaN or infinity)")
+    if any(label not in (0, 1) for label in labels):
+        raise ValueError("labels must be 0 or 1")
 
 
 def _threshold_grid(scores: Sequence[float]) -> list[float]:
@@ -173,6 +181,8 @@ def _threshold_grid(scores: Sequence[float]) -> list[float]:
     exact rather than grid-resolution dependent -- important, because the
     recommended threshold is quoted verbatim in the report.
     """
+    if any(not math.isfinite(score) for score in scores):
+        raise ValueError("scores must be finite (no NaN or infinity)")
     candidates = sorted(set(scores))
     if not candidates:
         return [0.5]
@@ -192,9 +202,9 @@ def cost_at(scores: Sequence[float], labels: Sequence[int], threshold: float,
     classified as a non-match. That is a plausible-looking result produced by an
     upstream arithmetic fault, so NaN is rejected rather than absorbed.
     """
-    for score in scores:
-        if score != score:
-            raise ValueError("cost_at received a NaN score")
+    _validate_inputs(scores, labels)
+    if not math.isfinite(threshold):
+        raise ValueError("threshold must be finite")
     tp = fp = tn = fn = 0
     for score, label in zip(scores, labels):
         predicted = 1 if score >= threshold else 0
@@ -218,10 +228,14 @@ def find_operating_point(scores: Sequence[float], labels: Sequence[int],
     grid) is both exact and free of grid-resolution artefacts, which matters
     when the recommended threshold is quoted in a report.
     """
-    if not set(scores):
+    _validate_inputs(scores, labels)
+    if not scores:
         return Confusion(0.5, 0, 0, 0, 0)
 
     thresholds = _threshold_grid(scores)
+    # Rejecting every pair can be optimal, especially when false positives
+    # are costly or the scores contain no useful separation.
+    thresholds.append(math.nextafter(max(scores), math.inf))
 
     best: Confusion | None = None
     best_key: tuple[float, int, float] | None = None
@@ -258,10 +272,10 @@ def zero_fp_point(scores: Sequence[float], labels: Sequence[int]) -> Confusion:
     algorithm that cannot separate a single positive is reported that way
     rather than being handed a flattering threshold it never earned.
     """
+    _validate_inputs(scores, labels)
     candidates = sorted(set(scores))
     if not candidates:
-        return Confusion(1.0, 0, 0, sum(1 for label in labels if label == 0),
-                         0, sum(labels))
+        return Confusion(1.0, 0, 0, 0, 0)
 
     best: Confusion | None = None
     for threshold in candidates:
@@ -302,6 +316,7 @@ def pr_auc(scores: Sequence[float], labels: Sequence[int]) -> float:
     dominated by the (large, easy) negative population, which flatters a
     matcher that is only good on the easy tail.
     """
+    _validate_inputs(scores, labels)
     if not scores:
         return 0.0
     n_positive = sum(labels)
@@ -357,8 +372,7 @@ def roc_auc(scores: Sequence[float], labels: Sequence[int]) -> float:
     intuitive-looking choice) silently returns ``1 - AUC``, which is the kind of
     bug that survives review because the number still "looks like" a metric.
     """
-    if any(score != score for score in scores):
-        raise ValueError("roc_auc received a NaN score")
+    _validate_inputs(scores, labels)
 
     n_positive = sum(labels)
     n_negative = len(labels) - n_positive
@@ -409,6 +423,10 @@ def bootstrap_cost_delta(scores_a: Sequence[float], labels: Sequence[int],
         raise ValueError(
             "bootstrap_cost_delta requires paired inputs: "
             f"{len(scores_a)} scores_a, {len(scores_b)} scores_b, {n} labels")
+    _validate_inputs(scores_a, labels)
+    _validate_inputs(scores_b, labels)
+    if iterations <= 0:
+        raise ValueError("bootstrap iterations must be positive")
     if n == 0:
         return {"mean_delta": 0.0, "ci_low": 0.0, "ci_high": 0.0, "p_a_cheaper": 0.5}
 
@@ -473,6 +491,9 @@ def three_band_split(scores: Sequence[float], labels: Sequence[int],
     error rates inside each band is more useful to a reviewer than any single
     threshold.
     """
+    _validate_inputs(scores, labels)
+    if not (math.isfinite(low) and math.isfinite(high)) or low > high:
+        raise ValueError("band boundaries must be finite and low <= high")
     bands = {
         "approve": {"n": 0, "correct": 0},
         "review": {"n": 0, "correct": 0},
@@ -522,10 +543,10 @@ def interpolated_precision_at_recall(scores: Sequence[float], labels: Sequence[i
        at or above 0.50, because the line between "nothing above the
        threshold" and "everything below it" looks like a slope.
 
-    2. **P(R) is non-increasing in R.** Precision *cannot* rise as you demand
-       more recall, because demanding more recall means admitting more items,
-       which can only add false positives. Linear interpolation is free to
-       violate this, and did for two of the five algorithms, producing a
+    2. **P(R) is non-increasing in R.** Increasing R shrinks the set of
+       feasible thresholds over which the maximum is taken. Raw precision
+       may rise or fall as additional positives and negatives are admitted.
+       Linear interpolation is free to violate this, and did for two of the five algorithms, producing a
        precision-recall table that was not monotone in the one dimension the
        table is indexed by.
 
@@ -533,6 +554,7 @@ def interpolated_precision_at_recall(scores: Sequence[float], labels: Sequence[i
     everything" always reaches recall 1.0, so on a well-formed input this is
     0.0 only when there are no positives at all.
     """
+    _validate_inputs(scores, labels)
     n_positive = sum(labels)
     if n_positive == 0 or target_recall <= 0.0:
         return 0.0
@@ -595,8 +617,11 @@ def find_operating_point_at_recall(scores: Sequence[float], labels: Sequence[int
     With that, every algorithm in the comparison is answering the same question:
     "at 90% recall, how many false positives do you produce?"
     """
-    if sum(labels) == 0 or not set(scores):
-        return Confusion(0.5, 0, 0, 0, sum(labels))
+    _validate_inputs(scores, labels)
+    if not scores:
+        return Confusion(0.5, 0, 0, 0, 0)
+    if sum(labels) == 0:
+        return cost_at(scores, labels, math.nextafter(max(scores), math.inf))
 
     thresholds = _threshold_grid(scores)
 
@@ -621,7 +646,7 @@ def high_precision_point(scores: Sequence[float], labels: Sequence[int],
                          target_precision: float = 0.99) -> Confusion:
     """Lowest threshold whose precision reaches ``target_precision``.
 
-    Used as the **auto-approve** cut-off. The cost-optimal threshold maximises
+    Used as the **auto-approve** cut-off. The cost-optimal threshold minimises
     total cost but is not the threshold a production pipeline should auto-act
     on: it sits low enough to catch nearly every match, which is the right
     trade-off when a false negative costs 25x a false positive and the
@@ -629,6 +654,7 @@ def high_precision_point(scores: Sequence[float], labels: Sequence[int],
     Deciding without a human in the loop is a different decision with different
     stakes, so it gets its own, stricter cut-off.
     """
+    _validate_inputs(scores, labels)
     best: Confusion | None = None
     fallback: Confusion | None = None
     for threshold in _threshold_grid(scores):
@@ -646,7 +672,7 @@ def high_precision_point(scores: Sequence[float], labels: Sequence[int],
     # and record that the target was missed so a report can say so instead of
     # quietly presenting the fallback as if it had complied with the rule.
     if fallback is None:
-        return Confusion(0.5, 0, 0, sum(1 for label in labels if label == 0), 0, sum(labels))
+        return Confusion(0.5, 0, 0, 0, 0, target_met=False)
     return replace(fallback, target_met=False)
 
 
@@ -660,6 +686,7 @@ def zero_fn_point(scores: Sequence[float], labels: Sequence[int]) -> Confusion:
     still friction, and the cost model in :mod:`name_match.cli` is where the
     25:1 ratio that prices it is actually set.
     """
+    _validate_inputs(scores, labels)
     candidates = sorted(set(scores))
     if not candidates:
         return Confusion(1.0, 0, 0, 0, 0)
