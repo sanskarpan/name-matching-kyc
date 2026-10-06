@@ -1,0 +1,13 @@
+# Pre-interview exercise: name matching across identity documents.
+#
+# There are NO third-party dependencies. This file exists so that a reviewer
+# who runs `pip install -r requirements.txt` gets a clean no-op rather than an
+# error, and so the zero-install claim is checkable rather than asserted.
+#
+# Requires: Python 3.9 or newer (standard library only).
+# Verified on: CPython 3.14.
+#
+# Deliberately absent: rapidfuzz, jellyfish, python-Levenshtein, numpy,
+# scikit-learn, pandas. The string metrics, the phonetic encodings and the
+# logistic regression are all implemented in this repository. See NOTES.md for
+# why.
