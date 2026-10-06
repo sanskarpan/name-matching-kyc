@@ -1,0 +1,1996 @@
+{
+  "algorithms": {
+    "exact_normalized": {
+      "at_recall_floor": {
+        "accuracy": 0.2834008097165992,
+        "cost": 354.0,
+        "cost_per_pair": 0.7165991902834008,
+        "f1": 0.44164037854889593,
+        "fn": 0,
+        "fp": 354,
+        "precision": 0.2834008097165992,
+        "recall": 1.0,
+        "threshold": 0.0,
+        "tn": 0,
+        "tp": 140
+      },
+      "band_detail": {
+        "approve_at_or_above": 0.5,
+        "approve_band_empty": false,
+        "approve_coverage": 0.4857142857142857,
+        "approve_meets_target": false,
+        "approve_precision": 0.8192771084337349,
+        "bands_collapsed": false,
+        "raw_approve_at_or_above": 0.5,
+        "raw_reject_below": 0.0,
+        "reject_band_empty": true,
+        "reject_below": 0.0,
+        "reject_coverage": 1.0,
+        "reject_fn": 0,
+        "target_precision": 0.99,
+        "three_band_pipeline_usable": false
+      },
+      "band_thresholds": {
+        "high": 0.5,
+        "low": 0.0
+      },
+      "bands": {
+        "approve_accuracy": 0.8192771084337349,
+        "approve_n": 83,
+        "approve_pct": 16.80161943319838,
+        "reject_accuracy": null,
+        "reject_n": 0,
+        "reject_pct": 0.0,
+        "review_accuracy": 0.8248175182481752,
+        "review_n": 411,
+        "review_pct": 83.19838056680162
+      },
+      "label": "Exact (normalised tokens)",
+      "optimal": {
+        "accuracy": 0.2834008097165992,
+        "cost": 354.0,
+        "cost_per_pair": 0.7165991902834008,
+        "f1": 0.44164037854889593,
+        "fn": 0,
+        "fp": 354,
+        "precision": 0.2834008097165992,
+        "recall": 1.0,
+        "threshold": 0.0,
+        "tn": 0,
+        "tp": 140
+      },
+      "per_category": [
+        {
+          "category": "compound_surname",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 10,
+          "negatives": 0,
+          "positives": 10
+        },
+        {
+          "category": "formatting",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "hard_negative_common_surname",
+          "false_negatives": 0,
+          "false_positives": 137,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 137,
+          "negatives": 137,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_dropped_token",
+          "false_negatives": 0,
+          "false_positives": 4,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 4,
+          "negatives": 4,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_identical_name",
+          "false_negatives": 0,
+          "false_positives": 7,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 7,
+          "negatives": 7,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_near_duplicate",
+          "false_negatives": 0,
+          "false_positives": 36,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 36,
+          "negatives": 36,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_parent_child",
+          "false_negatives": 0,
+          "false_positives": 4,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 4,
+          "negatives": 4,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_partial_overlap",
+          "false_negatives": 0,
+          "false_positives": 73,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 73,
+          "negatives": 73,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_phonetic",
+          "false_negatives": 0,
+          "false_positives": 67,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 67,
+          "negatives": 67,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_sibling",
+          "false_negatives": 0,
+          "false_positives": 6,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 6,
+          "negatives": 6,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_sibling_reordered",
+          "false_negatives": 0,
+          "false_positives": 6,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 6,
+          "negatives": 6,
+          "positives": 0
+        },
+        {
+          "category": "honorific",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "initials",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "middle_name",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "suffix",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "surname_first",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "transliteration",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "transliteration_heldout",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 18,
+          "negatives": 0,
+          "positives": 18
+        },
+        {
+          "category": "typo",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "unrelated",
+          "false_negatives": 0,
+          "false_positives": 14,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 14,
+          "negatives": 14,
+          "positives": 0
+        }
+      ],
+      "pr_auc": 0.543683583379208,
+      "precision_at_recall": {
+        "0.5": 0.2834008097165992,
+        "0.7": 0.2834008097165992,
+        "0.9": 0.2834008097165992,
+        "0.95": 0.2834008097165992,
+        "0.99": 0.2834008097165992
+      },
+      "roc_auc": 0.7216707021791767,
+      "zero_fp": {
+        "accuracy": 0.7165991902834008,
+        "cost": 3500.0,
+        "cost_per_pair": 7.08502024291498,
+        "f1": null,
+        "fn": 140,
+        "fp": 0,
+        "precision": null,
+        "recall": 0.0,
+        "threshold": 1.000000001,
+        "tn": 354,
+        "tp": 0
+      }
+    },
+    "learned": {
+      "at_recall_floor": {
+        "accuracy": 0.9210526315789473,
+        "cost": 375.0,
+        "cost_per_pair": 0.7591093117408907,
+        "f1": 0.8659793814432989,
+        "fn": 14,
+        "fp": 25,
+        "precision": 0.8344370860927153,
+        "recall": 0.9,
+        "threshold": 0.5639326256477255,
+        "tn": 329,
+        "tp": 126
+      },
+      "band_detail": {
+        "approve_at_or_above": 0.9186341602043477,
+        "approve_band_empty": false,
+        "approve_coverage": 0.2857142857142857,
+        "approve_meets_target": true,
+        "approve_precision": 1.0,
+        "bands_collapsed": false,
+        "raw_approve_at_or_above": 0.9186341602043477,
+        "raw_reject_below": 0.05333879748478271,
+        "reject_band_empty": false,
+        "reject_below": 0.05333879748478271,
+        "reject_coverage": 1.0,
+        "reject_fn": 0,
+        "target_precision": 0.99,
+        "three_band_pipeline_usable": true
+      },
+      "band_thresholds": {
+        "high": 0.9186341602043477,
+        "low": 0.05333879748478271
+      },
+      "bands": {
+        "approve_accuracy": 1.0,
+        "approve_n": 40,
+        "approve_pct": 8.097165991902834,
+        "reject_accuracy": 1.0,
+        "reject_n": 255,
+        "reject_pct": 51.61943319838057,
+        "review_accuracy": 0.49748743718592964,
+        "review_n": 199,
+        "review_pct": 40.283400809716596
+      },
+      "label": "Learned combiner (logistic regression, out-of-fold)",
+      "optimal": {
+        "accuracy": 0.8744939271255061,
+        "cost": 86.0,
+        "cost_per_pair": 0.17408906882591094,
+        "f1": 0.8176470588235295,
+        "fn": 1,
+        "fp": 61,
+        "precision": 0.695,
+        "recall": 0.9928571428571429,
+        "threshold": 0.09157216099387189,
+        "tn": 293,
+        "tp": 139
+      },
+      "per_category": [
+        {
+          "category": "compound_surname",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 10,
+          "negatives": 0,
+          "positives": 10
+        },
+        {
+          "category": "formatting",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "hard_negative_common_surname",
+          "false_negatives": 0,
+          "false_positives": 13,
+          "fn_rate": null,
+          "fp_rate": 0.0948905109489051,
+          "n": 137,
+          "negatives": 137,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_dropped_token",
+          "false_negatives": 0,
+          "false_positives": 4,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 4,
+          "negatives": 4,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_identical_name",
+          "false_negatives": 0,
+          "false_positives": 7,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 7,
+          "negatives": 7,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_near_duplicate",
+          "false_negatives": 0,
+          "false_positives": 19,
+          "fn_rate": null,
+          "fp_rate": 0.5277777777777778,
+          "n": 36,
+          "negatives": 36,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_parent_child",
+          "false_negatives": 0,
+          "false_positives": 1,
+          "fn_rate": null,
+          "fp_rate": 0.25,
+          "n": 4,
+          "negatives": 4,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_partial_overlap",
+          "false_negatives": 0,
+          "false_positives": 2,
+          "fn_rate": null,
+          "fp_rate": 0.0273972602739726,
+          "n": 73,
+          "negatives": 73,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_phonetic",
+          "false_negatives": 0,
+          "false_positives": 8,
+          "fn_rate": null,
+          "fp_rate": 0.11940298507462686,
+          "n": 67,
+          "negatives": 67,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_sibling",
+          "false_negatives": 0,
+          "false_positives": 3,
+          "fn_rate": null,
+          "fp_rate": 0.5,
+          "n": 6,
+          "negatives": 6,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_sibling_reordered",
+          "false_negatives": 0,
+          "false_positives": 3,
+          "fn_rate": null,
+          "fp_rate": 0.5,
+          "n": 6,
+          "negatives": 6,
+          "positives": 0
+        },
+        {
+          "category": "honorific",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "initials",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "middle_name",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "suffix",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "surname_first",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "transliteration",
+          "false_negatives": 1,
+          "false_positives": 0,
+          "fn_rate": 0.07142857142857142,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "transliteration_heldout",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 18,
+          "negatives": 0,
+          "positives": 18
+        },
+        {
+          "category": "typo",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "unrelated",
+          "false_negatives": 0,
+          "false_positives": 1,
+          "fn_rate": null,
+          "fp_rate": 0.07142857142857142,
+          "n": 14,
+          "negatives": 14,
+          "positives": 0
+        }
+      ],
+      "pr_auc": 0.8947111979429189,
+      "precision_at_recall": {
+        "0.5": 0.8495575221238938,
+        "0.7": 0.8448275862068966,
+        "0.9": 0.8376623376623377,
+        "0.95": 0.8364779874213837,
+        "0.99": 0.695
+      },
+      "roc_auc": 0.9643159806295399,
+      "zero_fp": {
+        "accuracy": 0.7975708502024291,
+        "cost": 2500.0,
+        "cost_per_pair": 5.060728744939271,
+        "f1": 0.4444444444444445,
+        "fn": 100,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 0.2857142857142857,
+        "threshold": 0.934930130690988,
+        "tn": 354,
+        "tp": 40
+      }
+    },
+    "phonetic_jaro": {
+      "at_recall_floor": {
+        "accuracy": 0.8927125506072875,
+        "cost": 389.0,
+        "cost_per_pair": 0.7874493927125507,
+        "f1": 0.8262295081967215,
+        "fn": 14,
+        "fp": 39,
+        "precision": 0.7636363636363637,
+        "recall": 0.9,
+        "threshold": 0.8275062656641603,
+        "tn": 315,
+        "tp": 126
+      },
+      "band_detail": {
+        "approve_at_or_above": 0.9933333333333334,
+        "approve_band_empty": false,
+        "approve_coverage": 0.4857142857142857,
+        "approve_meets_target": false,
+        "approve_precision": 0.8947368421052632,
+        "bands_collapsed": false,
+        "raw_approve_at_or_above": 0.9933333333333334,
+        "raw_reject_below": 0.3333333333333333,
+        "reject_band_empty": false,
+        "reject_below": 0.3333333333333333,
+        "reject_coverage": 1.0,
+        "reject_fn": 0,
+        "target_precision": 0.99,
+        "three_band_pipeline_usable": true
+      },
+      "band_thresholds": {
+        "high": 0.9933333333333334,
+        "low": 0.3333333333333333
+      },
+      "bands": {
+        "approve_accuracy": 0.8947368421052632,
+        "approve_n": 76,
+        "approve_pct": 15.384615384615385,
+        "reject_accuracy": 1.0,
+        "reject_n": 14,
+        "reject_pct": 2.834008097165992,
+        "review_accuracy": 0.8217821782178217,
+        "review_n": 404,
+        "review_pct": 81.78137651821862
+      },
+      "label": "Phonetic + Jaro-Winkler",
+      "optimal": {
+        "accuracy": 0.8218623481781376,
+        "cost": 208.0,
+        "cost_per_pair": 0.42105263157894735,
+        "f1": 0.7541899441340781,
+        "fn": 5,
+        "fp": 83,
+        "precision": 0.6192660550458715,
+        "recall": 0.9642857142857143,
+        "threshold": 0.716970029239766,
+        "tn": 271,
+        "tp": 135
+      },
+      "per_category": [
+        {
+          "category": "compound_surname",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 10,
+          "negatives": 0,
+          "positives": 10
+        },
+        {
+          "category": "formatting",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "hard_negative_common_surname",
+          "false_negatives": 0,
+          "false_positives": 18,
+          "fn_rate": null,
+          "fp_rate": 0.13138686131386862,
+          "n": 137,
+          "negatives": 137,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_dropped_token",
+          "false_negatives": 0,
+          "false_positives": 4,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 4,
+          "negatives": 4,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_identical_name",
+          "false_negatives": 0,
+          "false_positives": 7,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 7,
+          "negatives": 7,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_near_duplicate",
+          "false_negatives": 0,
+          "false_positives": 32,
+          "fn_rate": null,
+          "fp_rate": 0.8888888888888888,
+          "n": 36,
+          "negatives": 36,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_parent_child",
+          "false_negatives": 0,
+          "false_positives": 1,
+          "fn_rate": null,
+          "fp_rate": 0.25,
+          "n": 4,
+          "negatives": 4,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_partial_overlap",
+          "false_negatives": 0,
+          "false_positives": 6,
+          "fn_rate": null,
+          "fp_rate": 0.0821917808219178,
+          "n": 73,
+          "negatives": 73,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_phonetic",
+          "false_negatives": 0,
+          "false_positives": 5,
+          "fn_rate": null,
+          "fp_rate": 0.07462686567164178,
+          "n": 67,
+          "negatives": 67,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_sibling",
+          "false_negatives": 0,
+          "false_positives": 6,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 6,
+          "negatives": 6,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_sibling_reordered",
+          "false_negatives": 0,
+          "false_positives": 4,
+          "fn_rate": null,
+          "fp_rate": 0.6666666666666666,
+          "n": 6,
+          "negatives": 6,
+          "positives": 0
+        },
+        {
+          "category": "honorific",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "initials",
+          "false_negatives": 1,
+          "false_positives": 0,
+          "fn_rate": 0.07142857142857142,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "middle_name",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "suffix",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "surname_first",
+          "false_negatives": 3,
+          "false_positives": 0,
+          "fn_rate": 0.21428571428571427,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "transliteration",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "transliteration_heldout",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 18,
+          "negatives": 0,
+          "positives": 18
+        },
+        {
+          "category": "typo",
+          "false_negatives": 1,
+          "false_positives": 0,
+          "fn_rate": 0.07142857142857142,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "unrelated",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": null,
+          "fp_rate": 0.0,
+          "n": 14,
+          "negatives": 14,
+          "positives": 0
+        }
+      ],
+      "pr_auc": 0.8236405310697658,
+      "precision_at_recall": {
+        "0.5": 0.8539325842696629,
+        "0.7": 0.8064516129032258,
+        "0.9": 0.7636363636363637,
+        "0.95": 0.6751269035532995,
+        "0.99": 0.33985330073349634
+      },
+      "roc_auc": 0.9311238902340597,
+      "zero_fp": {
+        "accuracy": 0.7165991902834008,
+        "cost": 3500.0,
+        "cost_per_pair": 7.08502024291498,
+        "f1": null,
+        "fn": 140,
+        "fp": 0,
+        "precision": null,
+        "recall": 0.0,
+        "threshold": 1.000000001,
+        "tn": 354,
+        "tp": 0
+      }
+    },
+    "token_aligned": {
+      "at_recall_floor": {
+        "accuracy": 0.8623481781376519,
+        "cost": 404.0,
+        "cost_per_pair": 0.8178137651821862,
+        "f1": 0.7875,
+        "fn": 14,
+        "fp": 54,
+        "precision": 0.7,
+        "recall": 0.9,
+        "threshold": 0.5856780484740497,
+        "tn": 300,
+        "tp": 126
+      },
+      "band_detail": {
+        "approve_at_or_above": 0.9894021739130435,
+        "approve_band_empty": false,
+        "approve_coverage": 0.32857142857142857,
+        "approve_meets_target": false,
+        "approve_precision": 0.8679245283018868,
+        "bands_collapsed": false,
+        "raw_approve_at_or_above": 0.9894021739130435,
+        "raw_reject_below": 0.2394248188405797,
+        "reject_band_empty": false,
+        "reject_below": 0.2394248188405797,
+        "reject_coverage": 1.0,
+        "reject_fn": 0,
+        "target_precision": 0.99,
+        "three_band_pipeline_usable": true
+      },
+      "band_thresholds": {
+        "high": 0.9894021739130435,
+        "low": 0.2394248188405797
+      },
+      "bands": {
+        "approve_accuracy": 0.8679245283018868,
+        "approve_n": 53,
+        "approve_pct": 10.728744939271255,
+        "reject_accuracy": 1.0,
+        "reject_n": 33,
+        "reject_pct": 6.680161943319838,
+        "review_accuracy": 0.7696078431372549,
+        "review_n": 408,
+        "review_pct": 82.5910931174089
+      },
+      "label": "Token-aligned weighted scorer",
+      "optimal": {
+        "accuracy": 0.8461538461538461,
+        "cost": 196.0,
+        "cost_per_pair": 0.3967611336032389,
+        "f1": 0.7803468208092486,
+        "fn": 5,
+        "fp": 71,
+        "precision": 0.6553398058252428,
+        "recall": 0.9642857142857143,
+        "threshold": 0.5295224432517494,
+        "tn": 283,
+        "tp": 135
+      },
+      "per_category": [
+        {
+          "category": "compound_surname",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 10,
+          "negatives": 0,
+          "positives": 10
+        },
+        {
+          "category": "formatting",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "hard_negative_common_surname",
+          "false_negatives": 0,
+          "false_positives": 11,
+          "fn_rate": null,
+          "fp_rate": 0.08029197080291971,
+          "n": 137,
+          "negatives": 137,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_dropped_token",
+          "false_negatives": 0,
+          "false_positives": 4,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 4,
+          "negatives": 4,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_identical_name",
+          "false_negatives": 0,
+          "false_positives": 7,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 7,
+          "negatives": 7,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_near_duplicate",
+          "false_negatives": 0,
+          "false_positives": 35,
+          "fn_rate": null,
+          "fp_rate": 0.9722222222222222,
+          "n": 36,
+          "negatives": 36,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_parent_child",
+          "false_negatives": 0,
+          "false_positives": 4,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 4,
+          "negatives": 4,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_partial_overlap",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": null,
+          "fp_rate": 0.0,
+          "n": 73,
+          "negatives": 73,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_phonetic",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": null,
+          "fp_rate": 0.0,
+          "n": 67,
+          "negatives": 67,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_sibling",
+          "false_negatives": 0,
+          "false_positives": 5,
+          "fn_rate": null,
+          "fp_rate": 0.8333333333333334,
+          "n": 6,
+          "negatives": 6,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_sibling_reordered",
+          "false_negatives": 0,
+          "false_positives": 5,
+          "fn_rate": null,
+          "fp_rate": 0.8333333333333334,
+          "n": 6,
+          "negatives": 6,
+          "positives": 0
+        },
+        {
+          "category": "honorific",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "initials",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "middle_name",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "suffix",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "surname_first",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "transliteration",
+          "false_negatives": 1,
+          "false_positives": 0,
+          "fn_rate": 0.07142857142857142,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "transliteration_heldout",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 18,
+          "negatives": 0,
+          "positives": 18
+        },
+        {
+          "category": "typo",
+          "false_negatives": 4,
+          "false_positives": 0,
+          "fn_rate": 0.2857142857142857,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "unrelated",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": null,
+          "fp_rate": 0.0,
+          "n": 14,
+          "negatives": 14,
+          "positives": 0
+        }
+      ],
+      "pr_auc": 0.8006322746084392,
+      "precision_at_recall": {
+        "0.5": 0.8285714285714286,
+        "0.7": 0.8264462809917356,
+        "0.9": 0.7016574585635359,
+        "0.95": 0.6553398058252428,
+        "0.99": 0.30957683741648107
+      },
+      "roc_auc": 0.9248688458434221,
+      "zero_fp": {
+        "accuracy": 0.7165991902834008,
+        "cost": 3500.0,
+        "cost_per_pair": 7.08502024291498,
+        "f1": null,
+        "fn": 140,
+        "fp": 0,
+        "precision": null,
+        "recall": 0.0,
+        "threshold": 1.000000001,
+        "tn": 354,
+        "tp": 0
+      }
+    },
+    "token_jaccard": {
+      "at_recall_floor": {
+        "accuracy": 0.6740890688259109,
+        "cost": 377.0,
+        "cost_per_pair": 0.7631578947368421,
+        "f1": 0.6193853427895981,
+        "fn": 9,
+        "fp": 152,
+        "precision": 0.4628975265017668,
+        "recall": 0.9357142857142857,
+        "threshold": 0.225,
+        "tn": 202,
+        "tp": 131
+      },
+      "band_detail": {
+        "approve_at_or_above": 0.8333333333333333,
+        "approve_band_empty": false,
+        "approve_coverage": 0.4857142857142857,
+        "approve_meets_target": false,
+        "approve_precision": 0.8192771084337349,
+        "bands_collapsed": false,
+        "raw_approve_at_or_above": 0.8333333333333333,
+        "raw_reject_below": 0.0,
+        "reject_band_empty": true,
+        "reject_below": 0.0,
+        "reject_coverage": 1.0,
+        "reject_fn": 0,
+        "target_precision": 0.99,
+        "three_band_pipeline_usable": false
+      },
+      "band_thresholds": {
+        "high": 0.8333333333333333,
+        "low": 0.0
+      },
+      "bands": {
+        "approve_accuracy": 0.8192771084337349,
+        "approve_n": 83,
+        "approve_pct": 16.80161943319838,
+        "reject_accuracy": null,
+        "reject_n": 0,
+        "reject_pct": 0.0,
+        "review_accuracy": 0.8248175182481752,
+        "review_n": 411,
+        "review_pct": 83.19838056680162
+      },
+      "label": "Token-set Jaccard",
+      "optimal": {
+        "accuracy": 0.2834008097165992,
+        "cost": 354.0,
+        "cost_per_pair": 0.7165991902834008,
+        "f1": 0.44164037854889593,
+        "fn": 0,
+        "fp": 354,
+        "precision": 0.2834008097165992,
+        "recall": 1.0,
+        "threshold": 0.0,
+        "tn": 0,
+        "tp": 140
+      },
+      "per_category": [
+        {
+          "category": "compound_surname",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 10,
+          "negatives": 0,
+          "positives": 10
+        },
+        {
+          "category": "formatting",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "hard_negative_common_surname",
+          "false_negatives": 0,
+          "false_positives": 137,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 137,
+          "negatives": 137,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_dropped_token",
+          "false_negatives": 0,
+          "false_positives": 4,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 4,
+          "negatives": 4,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_identical_name",
+          "false_negatives": 0,
+          "false_positives": 7,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 7,
+          "negatives": 7,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_near_duplicate",
+          "false_negatives": 0,
+          "false_positives": 36,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 36,
+          "negatives": 36,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_parent_child",
+          "false_negatives": 0,
+          "false_positives": 4,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 4,
+          "negatives": 4,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_partial_overlap",
+          "false_negatives": 0,
+          "false_positives": 73,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 73,
+          "negatives": 73,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_phonetic",
+          "false_negatives": 0,
+          "false_positives": 67,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 67,
+          "negatives": 67,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_sibling",
+          "false_negatives": 0,
+          "false_positives": 6,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 6,
+          "negatives": 6,
+          "positives": 0
+        },
+        {
+          "category": "hard_negative_sibling_reordered",
+          "false_negatives": 0,
+          "false_positives": 6,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 6,
+          "negatives": 6,
+          "positives": 0
+        },
+        {
+          "category": "honorific",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "initials",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "middle_name",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "suffix",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "surname_first",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "transliteration",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "transliteration_heldout",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 18,
+          "negatives": 0,
+          "positives": 18
+        },
+        {
+          "category": "typo",
+          "false_negatives": 0,
+          "false_positives": 0,
+          "fn_rate": 0.0,
+          "fp_rate": null,
+          "n": 14,
+          "negatives": 0,
+          "positives": 14
+        },
+        {
+          "category": "unrelated",
+          "false_negatives": 0,
+          "false_positives": 14,
+          "fn_rate": null,
+          "fp_rate": 1.0,
+          "n": 14,
+          "negatives": 14,
+          "positives": 0
+        }
+      ],
+      "pr_auc": 0.7062572518599975,
+      "precision_at_recall": {
+        "0.5": 0.81,
+        "0.7": 0.6424581005586593,
+        "0.9": 0.4628975265017668,
+        "0.95": 0.2834008097165992,
+        "0.99": 0.2834008097165992
+      },
+      "roc_auc": 0.8654358353510896,
+      "zero_fp": {
+        "accuracy": 0.7165991902834008,
+        "cost": 3500.0,
+        "cost_per_pair": 7.08502024291498,
+        "f1": null,
+        "fn": 140,
+        "fp": 0,
+        "precision": null,
+        "recall": 0.0,
+        "threshold": 1.000000001,
+        "tn": 354,
+        "tp": 0
+      }
+    }
+  },
+  "bootstrap_ranking_comparison": {
+    "a": "learned",
+    "b": "token_aligned",
+    "ci_high": 0.47773279352226716,
+    "ci_low": -0.010172064777327943,
+    "mean_delta": 0.22266295546558704,
+    "p_a_cheaper": 0.9715
+  },
+  "cost_sweep": {
+    "1:1": {
+      "exact_normalized": {
+        "cost_per_pair": 0.17611336032388664,
+        "fn": 72,
+        "fp": 15,
+        "threshold": 1.0
+      },
+      "learned": {
+        "cost_per_pair": 0.06680161943319839,
+        "fn": 7,
+        "fp": 26,
+        "threshold": 0.457649045001961
+      },
+      "phonetic_jaro": {
+        "cost_per_pair": 0.10728744939271255,
+        "fn": 15,
+        "fp": 38,
+        "threshold": 0.828030303030303
+      },
+      "token_aligned": {
+        "cost_per_pair": 0.10728744939271255,
+        "fn": 26,
+        "fp": 27,
+        "threshold": 0.7591203431692561
+      },
+      "token_jaccard": {
+        "cost_per_pair": 0.15789473684210525,
+        "fn": 59,
+        "fp": 19,
+        "threshold": 0.5833333333333333
+      }
+    },
+    "1:10": {
+      "exact_normalized": {
+        "cost_per_pair": 0.7165991902834008,
+        "fn": 0,
+        "fp": 354,
+        "threshold": 0.0
+      },
+      "learned": {
+        "cost_per_pair": 0.12753036437246965,
+        "fn": 3,
+        "fp": 33,
+        "threshold": 0.21256041657726216
+      },
+      "phonetic_jaro": {
+        "cost_per_pair": 0.2692307692307692,
+        "fn": 5,
+        "fp": 83,
+        "threshold": 0.716970029239766
+      },
+      "token_aligned": {
+        "cost_per_pair": 0.24493927125506074,
+        "fn": 5,
+        "fp": 71,
+        "threshold": 0.5295224432517494
+      },
+      "token_jaccard": {
+        "cost_per_pair": 0.4898785425101215,
+        "fn": 9,
+        "fp": 152,
+        "threshold": 0.225
+      }
+    },
+    "1:100": {
+      "exact_normalized": {
+        "cost_per_pair": 0.7165991902834008,
+        "fn": 0,
+        "fp": 354,
+        "threshold": 0.0
+      },
+      "learned": {
+        "cost_per_pair": 0.20040485829959515,
+        "fn": 0,
+        "fp": 99,
+        "threshold": 0.05290720342727244
+      },
+      "phonetic_jaro": {
+        "cost_per_pair": 0.6882591093117408,
+        "fn": 0,
+        "fp": 340,
+        "threshold": 0.3310457516339869
+      },
+      "token_aligned": {
+        "cost_per_pair": 0.6497975708502024,
+        "fn": 0,
+        "fp": 321,
+        "threshold": 0.23896625123479343
+      },
+      "token_jaccard": {
+        "cost_per_pair": 0.7165991902834008,
+        "fn": 0,
+        "fp": 354,
+        "threshold": 0.0
+      }
+    },
+    "1:25": {
+      "exact_normalized": {
+        "cost_per_pair": 0.7165991902834008,
+        "fn": 0,
+        "fp": 354,
+        "threshold": 0.0
+      },
+      "learned": {
+        "cost_per_pair": 0.17408906882591094,
+        "fn": 1,
+        "fp": 61,
+        "threshold": 0.09157216099387189
+      },
+      "phonetic_jaro": {
+        "cost_per_pair": 0.42105263157894735,
+        "fn": 5,
+        "fp": 83,
+        "threshold": 0.716970029239766
+      },
+      "token_aligned": {
+        "cost_per_pair": 0.3967611336032389,
+        "fn": 5,
+        "fp": 71,
+        "threshold": 0.5295224432517494
+      },
+      "token_jaccard": {
+        "cost_per_pair": 0.7165991902834008,
+        "fn": 0,
+        "fp": 354,
+        "threshold": 0.0
+      }
+    },
+    "1:3": {
+      "exact_normalized": {
+        "cost_per_pair": 0.4676113360323887,
+        "fn": 72,
+        "fp": 15,
+        "threshold": 1.0
+      },
+      "learned": {
+        "cost_per_pair": 0.08502024291497975,
+        "fn": 3,
+        "fp": 33,
+        "threshold": 0.21256041657726216
+      },
+      "phonetic_jaro": {
+        "cost_per_pair": 0.15789473684210525,
+        "fn": 12,
+        "fp": 42,
+        "threshold": 0.8127610134963076
+      },
+      "token_aligned": {
+        "cost_per_pair": 0.17408906882591094,
+        "fn": 5,
+        "fp": 71,
+        "threshold": 0.5295224432517494
+      },
+      "token_jaccard": {
+        "cost_per_pair": 0.2813765182186235,
+        "fn": 25,
+        "fp": 64,
+        "threshold": 0.29166666666666663
+      }
+    },
+    "1:5": {
+      "exact_normalized": {
+        "cost_per_pair": 0.7165991902834008,
+        "fn": 0,
+        "fp": 354,
+        "threshold": 0.0
+      },
+      "learned": {
+        "cost_per_pair": 0.09716599190283401,
+        "fn": 3,
+        "fp": 33,
+        "threshold": 0.21256041657726216
+      },
+      "phonetic_jaro": {
+        "cost_per_pair": 0.20040485829959515,
+        "fn": 7,
+        "fp": 64,
+        "threshold": 0.7665837086889719
+      },
+      "token_aligned": {
+        "cost_per_pair": 0.19433198380566802,
+        "fn": 5,
+        "fp": 71,
+        "threshold": 0.5295224432517494
+      },
+      "token_jaccard": {
+        "cost_per_pair": 0.3825910931174089,
+        "fn": 25,
+        "fp": 64,
+        "threshold": 0.29166666666666663
+      }
+    },
+    "1:50": {
+      "exact_normalized": {
+        "cost_per_pair": 0.7165991902834008,
+        "fn": 0,
+        "fp": 354,
+        "threshold": 0.0
+      },
+      "learned": {
+        "cost_per_pair": 0.20040485829959515,
+        "fn": 0,
+        "fp": 99,
+        "threshold": 0.05290720342727244
+      },
+      "phonetic_jaro": {
+        "cost_per_pair": 0.6275303643724697,
+        "fn": 2,
+        "fp": 210,
+        "threshold": 0.6565615427457532
+      },
+      "token_aligned": {
+        "cost_per_pair": 0.6497975708502024,
+        "fn": 5,
+        "fp": 71,
+        "threshold": 0.5295224432517494
+      },
+      "token_jaccard": {
+        "cost_per_pair": 0.7165991902834008,
+        "fn": 0,
+        "fp": 354,
+        "threshold": 0.0
+      }
+    }
+  },
+  "cross_algorithm_errors_at_recall_floor": {
+    "algorithm_order": [
+      "learned",
+      "token_aligned",
+      "phonetic_jaro",
+      "exact_normalized",
+      "token_jaccard"
+    ],
+    "false_negatives": {
+      "compound_surname": {
+        "exact_normalized": 0,
+        "learned": 1,
+        "phonetic_jaro": 0,
+        "token_aligned": 7,
+        "token_jaccard": 0
+      },
+      "formatting": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "hard_negative_common_surname": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "hard_negative_dropped_token": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "hard_negative_identical_name": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "hard_negative_near_duplicate": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "hard_negative_parent_child": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "hard_negative_partial_overlap": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "hard_negative_phonetic": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "hard_negative_sibling": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "hard_negative_sibling_reordered": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "honorific": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "initials": {
+        "exact_normalized": 0,
+        "learned": 1,
+        "phonetic_jaro": 4,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "middle_name": {
+        "exact_normalized": 0,
+        "learned": 1,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "suffix": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "surname_first": {
+        "exact_normalized": 0,
+        "learned": 3,
+        "phonetic_jaro": 3,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "transliteration": {
+        "exact_normalized": 0,
+        "learned": 2,
+        "phonetic_jaro": 3,
+        "token_aligned": 2,
+        "token_jaccard": 3
+      },
+      "transliteration_heldout": {
+        "exact_normalized": 0,
+        "learned": 2,
+        "phonetic_jaro": 0,
+        "token_aligned": 1,
+        "token_jaccard": 2
+      },
+      "typo": {
+        "exact_normalized": 0,
+        "learned": 4,
+        "phonetic_jaro": 4,
+        "token_aligned": 4,
+        "token_jaccard": 4
+      },
+      "unrelated": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      }
+    },
+    "false_positives": {
+      "compound_surname": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "formatting": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "hard_negative_common_surname": {
+        "exact_normalized": 137,
+        "learned": 1,
+        "phonetic_jaro": 0,
+        "token_aligned": 5,
+        "token_jaccard": 81
+      },
+      "hard_negative_dropped_token": {
+        "exact_normalized": 4,
+        "learned": 3,
+        "phonetic_jaro": 4,
+        "token_aligned": 4,
+        "token_jaccard": 4
+      },
+      "hard_negative_identical_name": {
+        "exact_normalized": 7,
+        "learned": 7,
+        "phonetic_jaro": 7,
+        "token_aligned": 7,
+        "token_jaccard": 7
+      },
+      "hard_negative_near_duplicate": {
+        "exact_normalized": 36,
+        "learned": 13,
+        "phonetic_jaro": 23,
+        "token_aligned": 28,
+        "token_jaccard": 36
+      },
+      "hard_negative_parent_child": {
+        "exact_normalized": 4,
+        "learned": 1,
+        "phonetic_jaro": 1,
+        "token_aligned": 2,
+        "token_jaccard": 1
+      },
+      "hard_negative_partial_overlap": {
+        "exact_normalized": 73,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 4
+      },
+      "hard_negative_phonetic": {
+        "exact_normalized": 67,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 7
+      },
+      "hard_negative_sibling": {
+        "exact_normalized": 6,
+        "learned": 0,
+        "phonetic_jaro": 4,
+        "token_aligned": 5,
+        "token_jaccard": 6
+      },
+      "hard_negative_sibling_reordered": {
+        "exact_normalized": 6,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 3,
+        "token_jaccard": 6
+      },
+      "honorific": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "initials": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "middle_name": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "suffix": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "surname_first": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "transliteration": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "transliteration_heldout": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "typo": {
+        "exact_normalized": 0,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      },
+      "unrelated": {
+        "exact_normalized": 14,
+        "learned": 0,
+        "phonetic_jaro": 0,
+        "token_aligned": 0,
+        "token_jaccard": 0
+      }
+    },
+    "recall_floor": 0.9
+  },
+  "cross_validation": {
+    "fold_train_losses": [
+      0.17381158284799336,
+      0.18961425392235362,
+      0.17021875391300714,
+      0.1908330771708136,
+      0.18351708229648525
+    ],
+    "folds": 5,
+    "full_model_loss": 0.18350586245740377
+  },
+  "dataset": {
+    "categories": [
+      "compound_surname",
+      "formatting",
+      "hard_negative_common_surname",
+      "hard_negative_dropped_token",
+      "hard_negative_identical_name",
+      "hard_negative_near_duplicate",
+      "hard_negative_parent_child",
+      "hard_negative_partial_overlap",
+      "hard_negative_phonetic",
+      "hard_negative_sibling",
+      "hard_negative_sibling_reordered",
+      "honorific",
+      "initials",
+      "middle_name",
+      "suffix",
+      "surname_first",
+      "transliteration",
+      "transliteration_heldout",
+      "typo",
+      "unrelated"
+    ],
+    "n_negative": 354,
+    "n_pairs": 494,
+    "n_positive": 140
+  },
+  "metric": {
+    "cost_fn": 25.0,
+    "cost_fp": 1.0,
+    "name": "asymmetric misclassification cost per pair"
+  },
+  "recommended": "learned"
+}
